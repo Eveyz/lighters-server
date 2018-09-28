@@ -6,6 +6,7 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 const Book = require('../models/book');
+const Keyword = require('../models/keyword');
 import authenticate from '../middlewares/authenticate';
 
 /* Get Books */
@@ -16,31 +17,31 @@ router.get('/', authenticate, (req, res) => {
 			throw err;
 		}
 		res.json(books);
-	})
+	}).populate('keywords');
 });
 
 /* Get Book by id */
 router.get('/:_id', authenticate, (req, res) => {
 	var query = {_id: req.params._id};
 	
-	Book.find(query, (err, book) => {
+	Book.findOne(query, (err, book) => {
 		if(err) {
 			throw err;
 		}
 		res.json(book);
-	})
+	}).populate('keywords');
 });
 
 /* Create Books */
 router.post('/', authenticate, (req, res) => {
 	var body = req.body;
-  console.log(req.currentUser);
+  // console.log(req.currentUser);
 	Book.create(body, function(err, book) {
 		if(err) {
 			throw err;
 		}
 		res.json(book);
-	})
+	}).populate('keywords');
 });
 
 /* Delete Book */
@@ -52,7 +53,7 @@ router.delete('/:_id', (req, res) => {
 			throw err;
 		}
 		res.json(books);
-	})
+	}).populate('keywords');
 });
 
 /* Update Book */
@@ -75,7 +76,7 @@ router.use('/:_id', (req, res) => {
 			throw err;
 		}
 		res.json(book);
-	})
+	}).populate('keywords');
 });
 
 module.exports = router;

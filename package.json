@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon --exec babel-node server.js --ignore public/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "init": "node ./tasks/devInit.js"
   },
   "author": "",
   "license": "ISC",

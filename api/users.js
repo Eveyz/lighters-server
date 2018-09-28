@@ -39,8 +39,9 @@ router.post('/login', (req, res) => {
 });
 
 /* Signup User */
-router.post('/signup', (req, res) => {
-	if(req.body.email && req.body.username && req.body.firstname && req.body.lastname && req.body.password && req.body.passwordCon) {
+router.post('/', (req, res) => {
+  console.log(req.body);
+	if(req.body.email && req.body.password && req.body.passwordCon) {
     const newUser = new User({
       email: req.body.email,
       firstname: req.body.firstname,
@@ -61,7 +62,9 @@ router.post('/signup', (req, res) => {
         })
       });
     });
-	}
+	} else {
+    res.status(300).json({'fail': 'Missing information'});
+  }
 
 });
 

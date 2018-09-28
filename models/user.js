@@ -7,10 +7,12 @@ let bcrypt = require('bcrypt-nodejs');
 
 var userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
-  firstname: { type: String, required: true, unique: true },
-  lastname: { type: String, required: true, unique: true },
-  username: { type: String, required: true, unique: true },
-  status: { type: String, required: true },
+  // firstname: { type: String, required: true, unique: true },
+  // lastname: { type: String, required: true, unique: true },
+  username: { type: String, required: false, unique: false },
+  phone: { type: String, required: false }, 
+  wechat: { type: String, require: false },  
+  status: { type: String, required: true, default: "pending" },
   password: { type: String, required: true },
   passwordCon: { type: String, required: true },
   admin: { type: Boolean, default: false },

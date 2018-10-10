@@ -86,7 +86,7 @@ function createStudent() {
     var email = 'student' + i + '@lighter.com';
     let u = new User({
       email: email,
-      identity: '学员/家长',
+      identity: 'student',
       password: 'saiop147',
       passwordCon: 'saiop147'
     });
@@ -109,7 +109,7 @@ function createTeacher() {
     var email = 'teacher' + i + '@lighter.com';
     let u = new User({
       email: email,
-      identity: '老师',
+      identity: 'teacher',
       password: 'saiop147',
       passwordCon: 'saiop147'
     });

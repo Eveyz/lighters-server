@@ -7,6 +7,8 @@ const path = require('path');
 const router = express.Router();
 const Book = require('../models/book');
 const Keyword = require('../models/keyword');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
 import authenticate from '../middlewares/authenticate';
 
 /* Get Books */

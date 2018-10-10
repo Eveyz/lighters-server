@@ -4,12 +4,18 @@
 
 const express = require('express');
 const path = require('path');
+const _ = require('lodash');
 const router = express.Router();
 const User = require('../models/user');
+const Book = require('../models/book');
+const Course = require('../models/course');
+const Teacher = require('../models/teacher');
+const Student = require('../models/student');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
+const utils = require('../utils');
 
-router.post('/login', (req, res) => {
+router.post('/authenticate', (req, res) => {
   if(req.body.email && req.body.password) {
     User.findOne({ email: req.body.email }, function(err, user) {
       if (err) throw err;
@@ -21,7 +27,7 @@ router.post('/login', (req, res) => {
       }
 
       // Don't include sensitive information in the token
-      const userTokenData = {id: user.id, username: user.username, email: user.email};
+      const userTokenData = {id: user.id, username: user.username, email: user.email, identity: user.identity};
 
       user.validPassword(req.body.password, function(err, isMatch) {
         if (err) throw err;
@@ -35,16 +41,18 @@ router.post('/login', (req, res) => {
         // response to login successfully => reducer => res.data.token
       });
     });
+  } else {
+    res.status(300).json({'error': 'Missing information'});
   }
 });
 
 /* Signup User */
 router.post('/', (req, res) => {
-  console.log(req.body);
 	if(req.body.email && req.body.password && req.body.passwordCon) {
     const newUser = new User({
       email: req.body.email,
       firstname: req.body.firstname,
+      firstname: req.body.identity,
       lastname: req.body.lastname,
       username: req.body.username,
       status: req.body.status,
@@ -54,8 +62,7 @@ router.post('/', (req, res) => {
 
     newUser.save(function(err) {
       if(err) throw err;
-      console.log("User created.")
-      const userTokenData = {id: newUser.id, username: newUser.username, email: newUser.email};
+      const userTokenData = {id: newUser.id, username: newUser.username, email: newUser.email, identity: newUser.identity};
       jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: '2h'}, (err, token) => {
         res.json({
           token
@@ -63,53 +70,71 @@ router.post('/', (req, res) => {
       });
     });
 	} else {
-    res.status(300).json({'fail': 'Missing information'});
+    res.status(300).json({'error': 'Missing information'});
   }
 
 });
 
-// Format of token
-// Authorization: Bearer <access_token>
-
-// Verify Token
-// function verifyToken(req, res, next) {
-//   //Get auth header value
-//   const bearerHeader = req.headers['authorization'];
-//   // check if bearer is undefined
-//   if(typeof(bearerHeader) !== "undefined") {
-//     // split at the space
-//     const bearer = bearerHeader.split(' ');
-//     // Get token from array
-//     const bearerToken = bearer[1];
-//     // Set the token
-//     req.token = bearerToken;
-//     next();
-//   } else {
-//     // Forbidden
-//     res.sendStatus(403);
-//   }
-// }
-
 // //get current user from token
-// router.get('/user/from/token', verifyToken, (req, res) => {
-//   // check header or url parameters or post parameters for token
-//   var token = req.body.token || req.query.token;
-//   if (!token) {
-//     return res.status(401).json({message: 'Must pass token'});
-//   }
-//   jwt.verify(token, config.jwtSecret, (err, user) => {
-//     if(err) {
-//       res.sendStatus(403);
-//     } else {
-//       User.findById({'_id': user.id}, function(err, user) {
-//         if(err) throw err;
-//       })
-//       res.json({
-//         user
-//       });
-//     }
-//   });
-// });
+router.get('/from/token', utils.verifyToken, (req, res) => {
+  // check header or url parameters or post parameters for token
+  var token = req.body.token || req.query.token;
+  if (!token) {
+    return res.status(400).json({message: 'Must pass token'});
+  }
+  jwt.verify(token, config.jwtSecret, (err, tokenData) => {
+    if(err) {
+      if(err.name === "TokenExpiredError") {
+        console.log("it's expired");
+      }
+      res.sendStatus(401).json({msg: "it's expired"});
+    } else {
+      User.findById({'_id': tokenData.userTokenData.id}, function(err, user) {
+        if(err) throw err;
+      })
+      res.json({
+        user: tokenData,
+        token: token
+      });
+    }
+  });
+});
+
+router.get('/admin/init', utils.verifyAdmin, (req, res) => {
+  var _books = [], _courses = [], _students = [], _teachers = [];
+  var finished = _.after(4, function() {
+    res.json({
+      books: _books,
+      courses: _courses,
+      students: _students,
+      teachers: _teachers
+    });
+  });
+  Book.find({}, (err, books) => {
+    if(err)
+      throw err;
+    _books = books;
+    finished();
+  }).populate('keywords');
+  Course.find({}, (err, courses) => {
+    if(err)
+      throw err;
+    _courses = courses;
+    finished();
+  }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
+  Teacher.find({}, (err, teachers) => {
+    if(err)
+      throw err;
+    _teachers = teachers;
+    finished();
+  }).populate('courses').populate('students');
+  Student.find({}, (err, students) => {
+    if(err)
+      throw err;
+    _students = students;
+    finished();
+  }).populate('courses').populate('teachers');
+});
 
 // // routes that need to be authenticated
 

@@ -10,16 +10,18 @@ export default (req, res, next) => {
   }
 
   if(token) {
-    jwt.verify(token, config.jwtSecret, (err, decoded) => {
+    jwt.verify(token, config.jwtSecret, (err, tokenData) => {
       if(err) { 
         res.status(401).json({error: 'Failed to authenticate'}); 
       } else {
-        User.findOne({ id: decoded.id }).select('email id username').then(user => {
+        User.findById({'_id': tokenData.userTokenData.id}, function(err, user) {
+          if(err) throw err;
+
           if(!user) {
             res.status(404).json({error: 'No such user'});
           }
 
-          req.currentUser = user;
+          // req.currentUser = user;
           next();
         });
       }

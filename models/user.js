@@ -12,6 +12,7 @@ var userSchema = new mongoose.Schema({
   username: { type: String, required: false, unique: false },
   phone: { type: String, required: false }, 
   wechat: { type: String, require: false },  
+  identity: { type: String, require: false },  
   status: { type: String, required: true, default: "pending" },
   password: { type: String, required: true },
   passwordCon: { type: String, required: true },
@@ -49,6 +50,18 @@ userSchema.methods.validPassword = function(password) {
     if(err) throw err;
     isMatch = true;
   });
+};
+
+userSchema.methods.isAdmin = function() {
+  return this.identity === "admin";
+};
+
+userSchema.methods.isTeacher = function() {
+  return this.identity === "teacher";
+};
+
+userSchema.methods.isStudent = function() {
+  return this.identity === "student";
 };
 
 var User = mongoose.model('User', userSchema);

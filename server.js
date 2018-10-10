@@ -9,7 +9,9 @@ const config = require("./config");
 
 const usersAPI = require("./api/users");
 const booksAPI = require("./api/books");
+const coursesAPI = require("./api/courses");
 const teachersAPI = require("./api/teachers");
+const studentsAPI = require("./api/students");
 
 const server = express();
 
@@ -25,6 +27,9 @@ server.use(cookieParser());
 */
 server.use('/users', usersAPI);
 server.use('/books', booksAPI);
+server.use('/courses', coursesAPI);
+server.use('/teachers', teachersAPI);
+server.use('/students', studentsAPI);
 
 
 /* MongoDB connection 

@@ -14,7 +14,7 @@ var db = mongoose.connect(url, options).then(
 );
 
 module.exports = {
-  port: env.PORT || 8080,
+  port: env.PORT || 8000,
   jwtSecret: 'znz@lighters',
   db: db
 };

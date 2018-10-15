@@ -75,10 +75,16 @@ router.post('/:_id/post_student', utils.verifyAdmin, (req, res) => {
   let query = {_id: req.params._id};
   let body = req.body;
 
-  Course.findOne(query, (err, course) => {
+  let update = {
+    '$push': {
+      "students": body.studentID
+    }
+  }
+
+  let options = {new: true};
+
+  Course.findOneAndUpdate(query, update, options, (err, course) => {
     if(err) throw(err);
-    course.students.push(body.studentID);
-    course.save();
     res.json(course);
   }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students', 'lastname firstname');
 });

@@ -11,6 +11,7 @@ const config = require('../config');
 const utils = require('../utils');
 const mongoose = require('mongoose');
 import authenticate from '../middlewares/authenticate';
+import { DEFAULT_ENCODING } from 'crypto';
 
 /* Get Books */
 router.get('/', utils.verifyAdmin, (req, res) => {
@@ -36,7 +37,7 @@ router.get('/:_id', authenticate, (req, res) => {
 });
 
 /* Create courses */
-router.post('/', authenticate, (req, res) => {
+router.post('/', utils.verifyAdmin, (req, res) => {
   var body = req.body;
   var ids = [];
   ids.push(mongoose.Types.ObjectId(body.teacher));
@@ -55,7 +56,7 @@ router.post('/', authenticate, (req, res) => {
 });
 
 /* Delete course */
-router.delete('/:_id', (req, res) => {
+router.delete('/:_id', utils.verifyAdmin, (req, res) => {
   var query = {_id: req.params._id};
 	
 	Course.remove(query, (err, courses) => {
@@ -69,10 +70,23 @@ router.delete('/:_id', (req, res) => {
 	});
 });
 
+/* Add student */
+router.post('/:_id/post_student', utils.verifyAdmin, (req, res) => {
+  let query = {_id: req.params._id};
+  let body = req.body;
+
+  Course.findOne(query, (err, course) => {
+    if(err) throw(err);
+    course.students.push(body.studentID);
+    course.save();
+    res.json(course);
+  }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students', 'lastname firstname');
+});
+
 /* Update course */
-router.use('/:_id', (req, res) => {
+router.put('/:_id', utils.verifyAdmin, (req, res) => {
 	var course = req.body;
-	var query = req.params._id;
+	var query = {_id: req.params._id};
 	// if the field doesn't exist $set will set a new field
 	var update = {
 		'$set': {

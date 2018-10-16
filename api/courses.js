@@ -55,6 +55,29 @@ router.post('/', utils.verifyAdmin, (req, res) => {
 	})
 });
 
+/* Update course */
+router.put('/:_id', utils.verifyAdmin, (req, res) => {
+	var course = req.body;
+	var query = {_id: req.params._id};
+	// if the field doesn't exist $set will set a new field
+	var update = {
+		'$set': {
+			title: course.title,
+			description: course.description,
+			author: course.author
+		}
+	};
+
+	var options = { new: true }; // newly updated record
+
+	Course.findOneAndUpdate(query, update, options, (err, course) =>{
+		if(err) {
+			throw err;
+		}
+		res.json(course);
+	}).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
+});
+
 /* Delete course */
 router.delete('/:_id', utils.verifyAdmin, (req, res) => {
   var query = {_id: req.params._id};
@@ -89,27 +112,61 @@ router.post('/:_id/post_student', utils.verifyAdmin, (req, res) => {
   }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students', 'lastname firstname');
 });
 
-/* Update course */
-router.put('/:_id', utils.verifyAdmin, (req, res) => {
-	var course = req.body;
-	var query = {_id: req.params._id};
-	// if the field doesn't exist $set will set a new field
-	var update = {
-		'$set': {
-			title: course.title,
-			description: course.description,
-			author: course.author
-		}
-	};
+/* Delete student */
+router.put('/:_id/delete_student', utils.verifyAdmin, (req, res) => {
+  let query = {_id: req.params._id};
+  let body = req.body;
 
-	var options = { new: true }; // newly updated record
+  let update = {
+    '$pull': {
+      "students": body.studentID
+    }
+  }
 
-	Course.findOneAndUpdate(query, update, options, (err, course) =>{
-		if(err) {
-			throw err;
-		}
-		res.json(course);
-	}).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
+  let options = {new: true};
+
+  Course.findOneAndUpdate(query, update, options, (err, course) => {
+    if(err) throw(err);
+    res.json(course);
+  }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students', 'lastname firstname');
+});
+
+/* Add book */
+router.post('/:_id/post_book', utils.verifyAdmin, (req, res) => {
+  let query = {_id: req.params._id};
+  let body = req.body;
+
+  let update = {
+    '$push': {
+      "books": body.bookID
+    }
+  }
+
+  let options = {new: true};
+
+  Course.findOneAndUpdate(query, update, options, (err, course) => {
+    if(err) throw(err);
+    res.json(course);
+  }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students', 'lastname firstname');
+});
+
+/* Delete book */
+router.put('/:_id/delete_book', utils.verifyAdmin, (req, res) => {
+  let query = {_id: req.params._id};
+  let body = req.body;
+
+  let update = {
+    '$pull': {
+      "books": body.bookID
+    }
+  }
+
+  let options = {new: true};
+
+  Course.findOneAndUpdate(query, update, options, (err, course) => {
+    if(err) throw(err);
+    res.json(course);
+  }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students', 'lastname firstname');
 });
 
 module.exports = router;

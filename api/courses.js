@@ -57,15 +57,11 @@ router.post('/', utils.verifyAdmin, (req, res) => {
 
 /* Update course */
 router.put('/:_id', utils.verifyAdmin, (req, res) => {
-	var course = req.body;
-	var query = {_id: req.params._id};
+	let course = req.body;
+  let query = {_id: req.params._id};
 	// if the field doesn't exist $set will set a new field
-	var update = {
-		'$set': {
-			title: course.title,
-			description: course.description,
-			author: course.author
-		}
+	let update = {
+		'$set': course
 	};
 
 	var options = { new: true }; // newly updated record

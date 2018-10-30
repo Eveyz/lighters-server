@@ -17,6 +17,7 @@ var courseSchema = new mongoose.Schema({
   books: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Book'} ],
   teachers: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'} ],
   students: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Student'} ],
+  reports: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Report'} ],
   time_slot: [],
   created_at: Date,
   updated_at: Date

@@ -35,9 +35,55 @@ router.post('/authenticate', (req, res) => {
       });
 
       jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: '2h'}, (err, token) => {
-        res.json({
-          token
-        })
+        if(user.isTeacher) {
+          Teacher.findOne({ user_id: user.id }, (err, teacher) => {
+            if(err) throw err;
+            res.json({
+              token: token,
+              teacher: teacher
+            });
+          }).populate('courses').populate({
+            path: 'courses',
+            model: 'Course',
+            populate: {
+              path: 'books',
+              model: 'Book'
+            }
+          }).populate({
+            path: 'courses',
+            model: 'Course',
+            populate: {
+              path: 'students',
+              model: 'Student'
+            }
+          }).populate('students');
+        } else if (user.isStudent) {
+          Student.findOne({ user_id: user.id }, (err, student) => {
+            if(err) throw err;
+            res.json({
+              token: token,
+              student: student
+            });
+          }).populate('courses').populate({
+            path: 'courses',
+            model: 'Course',
+            populate: {
+              path: 'books',
+              model: 'Book'
+            }
+          }).populate({
+            path: 'courses',
+            model: 'Course',
+            populate: {
+              path: 'teachers',
+              model: 'Teacher'
+            }
+          }).populate('teachers');
+        } else {
+          res.json({
+            token
+          })
+        }
         // response to login successfully => reducer => res.data.token
       });
     });

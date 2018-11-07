@@ -12,6 +12,8 @@ const booksAPI = require("./api/books");
 const coursesAPI = require("./api/courses");
 const teachersAPI = require("./api/teachers");
 const studentsAPI = require("./api/students");
+const reportsAPI = require("./api/reports");
+const keywordsAPI = require("./api/keywords");
 
 const server = express();
 
@@ -20,7 +22,7 @@ server.use(logger('dev'));
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: false }));
 server.use(cookieParser());
-
+// server.use('/public', express.static(__dirname + '/public'));
 
 /* API 
  * @author: znz
@@ -30,6 +32,8 @@ server.use('/books', booksAPI);
 server.use('/courses', coursesAPI);
 server.use('/teachers', teachersAPI);
 server.use('/students', studentsAPI);
+server.use('/reports', reportsAPI);
+server.use('/keywords', keywordsAPI);
 
 
 /* MongoDB connection 

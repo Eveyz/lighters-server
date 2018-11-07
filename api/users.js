@@ -47,7 +47,11 @@ router.post('/authenticate', (req, res) => {
             model: 'Course',
             populate: {
               path: 'books',
-              model: 'Book'
+              model: 'Book',
+              populate: {
+                path: 'keywords',
+                model: 'Keyword'
+              }
             }
           }).populate({
             path: 'courses',
@@ -69,7 +73,11 @@ router.post('/authenticate', (req, res) => {
             model: 'Course',
             populate: {
               path: 'books',
-              model: 'Book'
+              model: 'Book',
+              populate: {
+                path: 'keywords',
+                model: 'Keyword'
+              }
             }
           }).populate({
             path: 'courses',

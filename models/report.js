@@ -5,9 +5,9 @@
 var mongoose = require('mongoose');
 
 var reportSchema = new mongoose.Schema({
-  teacher_id: Number,
-  course_id: Number,
-  student_id: Number,
+  teacher_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'},
+  course_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Course'},
+  student_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Student'},
   course_date: String,
   duration: Number,
   report_number: Number,
@@ -17,12 +17,12 @@ var reportSchema = new mongoose.Schema({
   homework: String,
   start_time: String,
   end_time: String,
-  links: String,
-  review: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Book'} ],
-  content: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Book'} ],
+  external_link: String,
+  review_books: [],
+  new_books: [],
   future_books: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Book'} ],
   audios: [],
-  keywords: [],
+  audios_files: [],
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   created_at: Date,
   updated_at: Date

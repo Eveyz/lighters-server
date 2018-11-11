@@ -122,15 +122,15 @@ router.put('/:_id', utils.verifyAdmin, (req, res) => {
 router.delete('/:_id', utils.verifyAdmin, (req, res) => {
   var query = {_id: req.params._id};
 	
-	Course.remove(query, (err, courses) => {
-		if(err) {
-			throw err;
-    }
-    const response = {
-      message: "Course successfully deleted"
-    };
-		res.json(response);
-	});
+  Course.findOneAndRemove(query, (err, course) => {
+		if (err) {
+			return res.json({success: false, msg: 'Cannot remove course'});
+		}
+		if (!course) {
+			return res.status(404).json({success: false, msg: 'Course not found'});
+		}
+    res.json({success: true, msg: 'Course deleted.'});
+  });
 });
 
 /* Add student */

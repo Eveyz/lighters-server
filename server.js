@@ -14,6 +14,7 @@ const teachersAPI = require("./api/teachers");
 const studentsAPI = require("./api/students");
 const reportsAPI = require("./api/reports");
 const keywordsAPI = require("./api/keywords");
+const schedulesAPI = require("./api/schedule");
 
 const server = express();
 
@@ -34,7 +35,7 @@ server.use('/teachers', teachersAPI);
 server.use('/students', studentsAPI);
 server.use('/reports', reportsAPI);
 server.use('/keywords', keywordsAPI);
-
+server.use('/schedules', schedulesAPI);
 
 /* MongoDB connection 
  * @author: znz

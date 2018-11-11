@@ -50,12 +50,15 @@ router.post('/', authenticate, (req, res) => {
 router.delete('/:_id', (req, res) => {
 	var query = {_id: req.params._id};
 	
-	Book.remove(query, (err, books) => {
-		if(err) {
-			throw err;
+	Book.findOneAndRemove(query, (err, book) => {
+		if (err) {
+			return res.json({success: false, msg: 'Cannot remove Book'});
 		}
-		res.json(books);
-	}).populate('keywords');
+		if (!book) {
+			return res.status(404).json({success: false, msg: 'Book not found'});
+		}
+    res.json({success: true, msg: 'Book deleted.'});
+  });
 });
 
 /* Update Book */

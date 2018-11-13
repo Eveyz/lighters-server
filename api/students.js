@@ -5,77 +5,79 @@
 const express = require('express');
 const path = require('path');
 const router = express.Router();
-const Teacher = require('../models/teacher');
+const Student = require('../models/student');
 import authenticate from '../middlewares/authenticate';
 
-/* Get Teachers */
+/* Get Students */
 router.get('/', authenticate, (req, res) => {
-  console.log(req.currentUser);
-	Teacher.find((err, teahcers) => {
+
+	Student.find((err, students) => {
 		if(err) {
 			throw err;
 		}
-		res.json(teachers);
+		res.json(students);
 	})
 });
 
-/* Get Book by id */
+/* Get Student by id */
 router.get('/:_id', (req, res) => {
 	var query = {_id: req.params._id};
 	
-	Teacher.find(query, (err, teacher) => {
+	Student.find(query, (err, student) => {
 		if(err) {
 			throw err;
 		}
-		res.json(teacher);
+		res.json(student);
 	})
 });
 
-/* Create Book */
+/* Create Student */
 router.post('/', authenticate, (req, res) => {
 	var body = req.body;
-  console.log(req.currentUser);
-	Teacher.create(body, function(err, teacher) {
+
+	Student.create(body, (err, student) => {
 		if(err) {
 			throw err;
 		}
-		res.json(teacher);
+		res.json(student);
 	})
 });
 
-/* Delete Book */
+/* Delete Student */
 router.delete('/:_id', (req, res) => {
 	var query = {_id: req.params._id};
 	
-	Teacher.remove(query, (err, teachers) => {
+	Student.remove(query, (err, students) => {
 		if(err) {
 			throw err;
 		}
-		res.json(teachers);
+		res.json(students);
 	})
 });
 
-/* Update Book */
-router.use('/:_id', (req, res) => {
-	var teacher = req.body;
-	var query = req.params._id;
-	// if the field doesn't exist $set will set a new field
-	var update = {
-		'$set': {
-			title: book.title,
-			description: book.description,
-			author: book.author
-		}
+/* Update Student */
+router.put('/:_id', authenticate, (req, res) => {
+  let _student = req.body;
+
+  let query = {_id: req.params._id};
+	let update = {
+		'$set': _student
 	};
 
-	var options = { new: true }; // newly updated record
+  var options = { new: true }; // newly updated record
 
-	Teacher.findOneAndUpdate(query, update, options, (err, teacher) =>{
+	Student.findOneAndUpdate(query, update, options, (err, student) =>{
 		if(err) {
 			throw err;
-		}
-		res.json(teacher);
-	})
+    }
+		if(!student) {
+      return res.status(404).json({
+        error: true,
+        message: 'Student not found'
+      });
+    }
+    res.json(student);
+	});
 });
 
 module.exports = router;

@@ -75,21 +75,21 @@ router.post('/', utils.verifyAdmin, (req, res) => {
 
 /* Update course */
 router.put('/:_id', utils.verifyAdmin, (req, res) => {
-  let course = req.body;
+  let _course = req.body;
 
   // update teacher for course
-  if(course.teachers.length > 0) {
+  if(_course.teachers && _course.teachers.length > 0) {
     let mongoose_ids = [];
-    course.teachers.forEach(id => {
+    _course.teachers.forEach(id => {
       mongoose_ids.push(mongoose.Types.ObjectId(id));
     });
-    course.teachers = mongoose_ids;
+    _course.teachers = mongoose_ids;
   }
 
   let query = {_id: req.params._id};
 	// if the field doesn't exist $set will set a new field
 	let update = {
-		'$set': course
+		'$set': _course
 	};
 
 	var options = { new: true }; // newly updated record
@@ -102,16 +102,19 @@ router.put('/:_id', utils.verifyAdmin, (req, res) => {
       if(err) {
         throw err;
       }
-      // append course into assign teacher
-      c.teachers.forEach(id => {
-        Teacher.findOneAndUpdate(
-          {_id: id}, 
-          {'$addToSet': { 'courses': c.id } }, 
-          options, 
-          (err, teacher) => {
-          if(err) throw err;
-        })
-      });
+
+      if(_course.teachers) {
+        // append course into assign teacher
+        c.teachers.forEach(id => {
+          Teacher.findOneAndUpdate(
+            {_id: id}, 
+            {'$addToSet': { 'courses': c.id } }, 
+            options, 
+            (err, teacher) => {
+            if(err) throw err;
+          })
+        });
+      }
 
       res.json(c);
     });

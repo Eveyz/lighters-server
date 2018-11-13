@@ -9,7 +9,20 @@ const Book = require('../models/book');
 const Keyword = require('../models/keyword');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
+const multer  = require('multer');
 import authenticate from '../middlewares/authenticate';
+
+var storage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    callback(null, 'uploads/books')
+  },
+  filename: (req, file, callback) => {
+    let ext = file.originalname.split('.').pop();
+    callback(null, file.originalname + '-' + Date.now() + '.' + ext)
+  }
+});
+var upload = multer({storage: storage});
+
 
 /* Get Books */
 router.get('/', authenticate, (req, res) => {
@@ -35,15 +48,23 @@ router.get('/:_id', authenticate, (req, res) => {
 });
 
 /* Create Books */
-router.post('/', authenticate, (req, res) => {
-	var body = req.body;
-  // console.log(req.currentUser);
-	Book.create(body, function(err, book) {
+router.post('/', upload.single("file"), authenticate, (req, res) => {
+	let _book = JSON.parse(req.body.book);
+	const file = req.file;
+	if(file) {
+		_book.file = {
+			originalname: file.originalname,
+      filename: file.filename,
+      path: file.path
+		}
+	}
+
+	Book.create(_book, function(err, book) {
 		if(err) {
 			throw err;
 		}
 		res.json(book);
-	}).populate('keywords');
+	});
 });
 
 /* Delete Book */

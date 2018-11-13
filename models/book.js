@@ -5,14 +5,16 @@
 var mongoose = require('mongoose');
 
 var bookSchema = new mongoose.Schema({
-  rlevel: String,
-  lslevel: String,
+  lightersLevel: String,
+  americanGrade: String,
+  razLevel: String,
+  lexileLevel: String,
   age: String,
   category: String,
   serials: String,
   name: String,
-  audio: String,
-  file: String,
+  audioLink: String,
+  file: {},
   cover: String,
   rcomments: String,
   bcomments: String,

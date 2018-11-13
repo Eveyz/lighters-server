@@ -42,6 +42,16 @@ server.use('/schedules', schedulesAPI);
 */
 var db = config.db;
 
-server.listen(config.port, () => {
-  console.info('Express listenning on port ', config.port);
+if (process.env.NODE_ENV === "production") {
+  server.use(express.static(path.join(__dirname, '/build')));
+
+  server.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/build/index.html'));
+  });
+}
+
+const PORT = process.env.PORT || config.port;
+
+server.listen(PORT, () => {
+  console.info('Express listenning on port ', PORT);
 });

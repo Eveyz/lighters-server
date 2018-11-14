@@ -35,8 +35,8 @@ router.post('/authenticate', (req, res) => {
       });
 
       jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: '2h'}, (err, token) => {
-        if(user.isTeacher) {
-          Teacher.findOne({ user_id: user.id }, (err, teacher) => {
+        if(user.identity === "teacher") {
+          Teacher.findOne({ user_id: user._id }, (err, teacher) => {
             if(err) throw err;
             res.json({
               token: token,
@@ -61,8 +61,8 @@ router.post('/authenticate', (req, res) => {
               model: 'Student'
             }
           }).populate('students');
-        } else if (user.isStudent) {
-          Student.findOne({ user_id: user.id }, (err, student) => {
+        } else if (user.identity === "student") {
+          Student.findOne({ user_id: user._id }, (err, student) => {
             if(err) throw err;
             res.json({
               token: token,

@@ -83,7 +83,7 @@ const createBooks = async function() {
 
 function createStudent() {
   for(let i = 0; i < 10; i++) {
-    var email = 'student' + i + '@lighter.com';
+    var email = 'student' + i + '@lighters.com';
     let u = new User({
       email: email,
       identity: 'student',
@@ -106,7 +106,7 @@ function createStudent() {
 
 function createTeacher() {
   for(let i = 0; i < 10; i++) {
-    var email = 'teacher' + i + '@lighter.com';
+    var email = 'teacher' + i + '@lighters.com';
     let u = new User({
       email: email,
       identity: 'teacher',

@@ -35,6 +35,7 @@ router.post('/authenticate', (req, res) => {
       });
 
       jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: '2h'}, (err, token) => {
+        if(err) throw err;
         if(user.identity === "teacher") {
           Teacher.findOne({ user_id: user._id }, (err, teacher) => {
             if(err) throw err;

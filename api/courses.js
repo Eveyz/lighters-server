@@ -63,7 +63,7 @@ router.post('/', utils.verifyAdmin, (req, res) => {
         Teacher.findOneAndUpdate(
           {_id: id}, 
           {'$addToSet': { 'courses': c.id } }, 
-          options, 
+          { new: true }, 
           (err, teacher) => {
           if(err) throw err;
         })

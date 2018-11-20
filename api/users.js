@@ -22,7 +22,8 @@ router.post('/authenticate', (req, res) => {
       if(!user) {
         return res.status(404).json({
           error: true,
-          message: 'Email or Password is wrong'
+          status: 'error',
+          msg: '登录邮箱或者密码错误'
         });
       }
 
@@ -39,6 +40,13 @@ router.post('/authenticate', (req, res) => {
         if(user.identity === "teacher") {
           Teacher.findOne({ user_id: user._id }, (err, teacher) => {
             if(err) throw err;
+
+            if(!teacher) {
+              return res.status(301).json({
+                token: token,
+                teacher: ""
+              });
+            }
             res.json({
               token: token,
               teacher: teacher
@@ -65,6 +73,14 @@ router.post('/authenticate', (req, res) => {
         } else if (user.identity === "student") {
           Student.findOne({ user_id: user._id }, (err, student) => {
             if(err) throw err;
+
+            if(!student) {
+              return res.status(301).json({
+                token: token,
+                student: ""
+              });
+            }
+
             res.json({
               token: token,
               student: student
@@ -97,7 +113,11 @@ router.post('/authenticate', (req, res) => {
       });
     });
   } else {
-    res.status(300).json({'error': 'Missing information'});
+    res.status(400).json({
+      error: true,
+      status: 'error',
+      msg: '邮箱或密码不能为空'
+    });
   }
 });
 
@@ -107,15 +127,15 @@ router.post('/', (req, res) => {
     const newUser = new User({
       email: req.body.email,
       firstname: req.body.firstname,
-      firstname: req.body.identity,
       lastname: req.body.lastname,
       username: req.body.username,
       status: req.body.status,
+      identity: req.body.identity,
 			password: req.body.password,
 			passwordCon: req.body.passwordCon
     });
 
-    newUser.save(function(err) {
+    newUser.save((err) => {
       if(err) throw err;
       const userTokenData = {id: newUser.id, username: newUser.username, email: newUser.email, identity: newUser.identity};
       jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: '2h'}, (err, token) => {

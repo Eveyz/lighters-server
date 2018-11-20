@@ -6,6 +6,8 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 const Student = require('../models/student');
+const Report = require('../models/report');
+const mongoose = require('mongoose');
 import authenticate from '../middlewares/authenticate';
 
 /* Get Students */
@@ -21,21 +23,49 @@ router.get('/', authenticate, (req, res) => {
 
 /* Get Student by id */
 router.get('/:_id', (req, res) => {
-	var query = {_id: req.params._id};
-	
-	Student.find(query, (err, student) => {
-		if(err) {
-			throw err;
-		}
-		res.json(student);
-	})
+	let query = {_id: req.params._id};
+
+	Student.findOne(query, (err, student) => {
+    if(err) throw err;
+    res.json(student);
+  }).populate('courses').populate({
+    path: 'courses',
+    model: 'Course',
+    populate: {
+      path: 'books',
+			model: 'Book',
+			populate: {
+				path: 'keywords',
+				model: 'Keyword'
+			}
+    }
+  }).populate({
+    path: 'courses',
+    model: 'Course',
+    populate: {
+      path: 'teachers',
+      model: 'Teacher'
+    }
+  });
+});
+
+/* Get student by id */
+router.get('/:_id/reports', (req, res) => {
+	// let _id = mongoose.Types.ObjectId(req.params._id);
+  let query = {student_id: req.params._id}
+
+	Report.find(query, (err, reports) => {
+		if(err) throw(err);
+
+		res.json(reports);
+	}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name');
 });
 
 /* Create Student */
 router.post('/', authenticate, (req, res) => {
-	var body = req.body;
+	let student = req.body;
 
-	Student.create(body, (err, student) => {
+	Student.create(student, (err, student) => {
 		if(err) {
 			throw err;
 		}

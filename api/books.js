@@ -84,18 +84,14 @@ router.delete('/:_id', (req, res) => {
 
 /* Update Book */
 router.use('/:_id', (req, res) => {
-	var book = req.body;
-	var query = req.params._id;
-	// if the field doesn't exist $set will set a new field
-	var update = {
-		'$set': {
-			title: book.title,
-			description: book.description,
-			author: book.author
-		}
+	let _book = req.body;
+	let query = {_id: req.params._id};
+
+	let update = {
+		'$set': _book
 	};
 
-	var options = { new: true }; // newly updated record
+	let options = { new: true };
 
 	Book.findOneAndUpdate(query, update, options, (err, book) =>{
 		if(err) {

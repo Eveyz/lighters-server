@@ -29,7 +29,7 @@ router.get('/', authenticate, (req, res) => {
 			throw err;
 		}
 		res.json(reports);
-	}).populate('future_books');
+	}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name').populate('student_id', 'lastname firstname');
 });
 
 /* Get Report by id */

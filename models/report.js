@@ -23,6 +23,8 @@ var reportSchema = new mongoose.Schema({
   future_books: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Book'} ],
   audios: [],
   audios_files: [],
+  paid: { type: Boolean, default: false },
+  credit: { type: Boolean, default: 1 },
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   created_at: Date,
   updated_at: Date

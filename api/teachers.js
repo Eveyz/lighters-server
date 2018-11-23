@@ -10,7 +10,7 @@ import authenticate from '../middlewares/authenticate';
 
 /* Get Teachers */
 router.get('/', authenticate, (req, res) => {
-	Teacher.find((err, teachers) => {
+	Teacher.find(req.query, (err, teachers) => {
 		if(err) {
 			throw err;
 		}

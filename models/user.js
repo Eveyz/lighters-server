@@ -11,13 +11,14 @@ var userSchema = new mongoose.Schema({
   // lastname: { type: String, required: true, unique: true },
   username: { type: String, required: false, unique: false },
   phone: { type: String, required: false }, 
-  wechat: { type: String, require: false },  
+  wechat: { type: String, require: false },
   identity: { type: String, require: false },  
   status: { type: String, required: true, default: "pending" },
   password: { type: String, required: true },
   passwordCon: { type: String, required: true },
   admin: { type: Boolean, default: false },
   remember: { type: Boolean, default: false },
+  consent: { type: Boolean, default: false },
   created_at: Date,
   updated_at: Date
 });

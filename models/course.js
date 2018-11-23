@@ -16,6 +16,7 @@ var courseSchema = new mongoose.Schema({
   status: { type: String, default: "active" },
   books: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Book'} ],
   teachers: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'} ],
+  interim_teachers: [{type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'}],
   students: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Student'} ],
   reports: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Report'} ],
   time_slot: [],

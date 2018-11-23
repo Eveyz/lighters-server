@@ -8,6 +8,7 @@ var reportSchema = new mongoose.Schema({
   teacher_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'},
   course_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Course'},
   student_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Student'},
+  situation: String,
   course_date: String,
   duration: Number,
   report_number: Number,
@@ -25,6 +26,7 @@ var reportSchema = new mongoose.Schema({
   audios_files: [],
   paid: { type: Boolean, default: false },
   credit: { type: Boolean, default: 1 },
+  status: { type: String, default: "active" },
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   created_at: Date,
   updated_at: Date

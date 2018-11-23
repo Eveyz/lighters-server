@@ -8,6 +8,7 @@ const path = require('path');
 const router = express.Router();
 const Report = require('../models/report');
 const Keyword = require('../models/keyword');
+const Paycheck = require('../models/paycheck');
 const mongoose = require('mongoose');
 const multer  = require('multer');
 import authenticate from '../middlewares/authenticate';
@@ -75,6 +76,33 @@ router.post('/', upload, authenticate, (req, res) => {
         message: 'Report not found'
       });
     }
+
+    // add report to paycheck
+    const _month = report.course_date.substring(0, 7)
+    const paycheck_query = {
+      teacher_id: _teacher_id,
+      student_id: _student_id,
+      course_id: _course_id
+    }
+    Report.findOne(paycheck_query, (err, pc) => {
+      if(err) throw err;
+      if(!pc) {
+        const _paycheck = {
+          teacher_id: _teacher_id,
+          student_id: _student_id,
+          course_id: _course_id,
+          month: _month,
+          reports: [report]
+        }
+        Paycheck.create(_paycheck, (err, paycheck) => {
+          if(err) console.error(err);
+        })
+      } else {
+        pc.reports.push(report)
+      }
+    })
+
+    // res
     report.populate('future_books', function(err, r) {
       if(err) {
         throw err;
@@ -104,7 +132,7 @@ router.post('/:_id', upload, authenticate, (req, res) => {
 
   _report.removedFiles.forEach(file => {
     fs.unlink(file.path, (err) => {
-      if (err) throw err;
+      if(err) console.error(err);
       console.log(`${file.filename} was deleted`);
     });
   })

@@ -30,7 +30,7 @@ function createAdmin() {
 
 const findKy = async function(c) {
   let ky = Keyword.findOne({content: c}, function(err, doc) {
-    if(err) throw err;
+    if(err) console.error(err);
   })
   return ky;
 }
@@ -47,7 +47,7 @@ const createWords = async function() {
         content: words[idx]
       });
       ky.save(function(err) {
-        if(err) throw err;
+        if(err) console.error(err);
         console.log("new ky", ky._id);
         keywords.push(ky._id);
       })
@@ -74,7 +74,7 @@ const createBooks = async function() {
       keywords: keywords
     });
     b.save(function(err) {
-      if(err) throw err;
+      if(err) console.error(err);
     });
   }
   console.log("Books created");

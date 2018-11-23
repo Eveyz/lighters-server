@@ -48,7 +48,7 @@ userSchema.methods.generateHash = function(password) {
 // checking if password is valid
 userSchema.methods.validPassword = function(password) {
   bcrypt.compareSync(password, this.password, function(err, isMatch) {
-    if(err) throw err;
+    if(err) console.error(err);
     isMatch = true;
   });
 };

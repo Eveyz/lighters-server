@@ -18,7 +18,7 @@ const utils = require('../utils');
 router.post('/authenticate', (req, res) => {
   if(req.body.email && req.body.password) {
     User.findOne({ email: req.body.email }, function(err, user) {
-      if (err) throw err;
+      if(err) console.error(err);
       if(!user) {
         return res.status(404).json({
           error: true,
@@ -31,15 +31,15 @@ router.post('/authenticate', (req, res) => {
       const userTokenData = {id: user.id, username: user.username, email: user.email, identity: user.identity};
 
       user.validPassword(req.body.password, function(err, isMatch) {
-        if (err) throw err;
+        if(err) console.error(err);
         console.log('Password:', isMatch);
       });
 
       jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: '2h'}, (err, token) => {
-        if(err) throw err;
+        if(err) console.error(err);
         if(user.identity === "teacher") {
           Teacher.findOne({ user_id: user._id }, (err, teacher) => {
-            if(err) throw err;
+            if(err) console.error(err);
 
             if(!teacher) {
               return res.status(301).json({
@@ -72,7 +72,7 @@ router.post('/authenticate', (req, res) => {
           }).populate('students');
         } else if (user.identity === "student") {
           Student.findOne({ user_id: user._id }, (err, student) => {
-            if(err) throw err;
+            if(err) console.error(err);
 
             if(!student) {
               return res.status(301).json({
@@ -136,7 +136,7 @@ router.post('/', (req, res) => {
     });
 
     newUser.save((err) => {
-      if(err) throw err;
+      if(err) console.error(err);
       const userTokenData = {id: newUser.id, username: newUser.username, email: newUser.email, identity: newUser.identity};
       jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: '2h'}, (err, token) => {
         res.json({
@@ -165,7 +165,7 @@ router.get('/from/token', utils.verifyToken, (req, res) => {
       res.sendStatus(401).json({msg: "it's expired"});
     } else {
       User.findById({'_id': tokenData.userTokenData.id}, function(err, user) {
-        if(err) throw err;
+        if(err) console.error(err);
       })
       res.json({
         user: tokenData,

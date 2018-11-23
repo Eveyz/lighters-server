@@ -15,7 +15,7 @@ export default (req, res, next) => {
         res.status(401).json({error: 'Failed to authenticate'}); 
       } else {
         User.findById({'_id': tokenData.userTokenData.id}, function(err, user) {
-          if(err) throw err;
+          if(err) console.error(err);
 
           if(!user) {
             res.status(404).json({error: 'No such user'});

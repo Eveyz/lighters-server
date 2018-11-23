@@ -26,7 +26,7 @@ router.get('/:_id', (req, res) => {
 	let query = {_id: req.params._id};
 
 	Student.findOne(query, (err, student) => {
-    if(err) throw err;
+    if(err) console.error(err);
     res.json(student);
   }).populate('courses').populate({
     path: 'courses',

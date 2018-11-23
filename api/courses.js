@@ -65,7 +65,7 @@ router.post('/', utils.verifyAdmin, (req, res) => {
           {'$addToSet': { 'courses': c.id } }, 
           { new: true }, 
           (err, teacher) => {
-          if(err) throw err;
+          if(err) console.error(err);
         })
       });
       res.json(c);
@@ -111,7 +111,7 @@ router.put('/:_id', utils.verifyAdmin, (req, res) => {
             {'$addToSet': { 'courses': c.id } }, 
             options, 
             (err, teacher) => {
-            if(err) throw err;
+            if(err) console.error(err);
           })
         });
       }
@@ -164,7 +164,7 @@ router.post('/:_id/post_student', utils.verifyAdmin, (req, res) => {
           {'$addToSet': { 'courses': c.id } }, 
           options, 
           (err, student) => {
-            if(err) throw err;
+            if(err) console.error(err);
           }
         )
       });
@@ -176,7 +176,7 @@ router.post('/:_id/post_student', utils.verifyAdmin, (req, res) => {
       //     {'$addToSet': { 'student': id }},
       //     options,
       //     (err, teacher) => {
-      //       if(err) throw err;
+      //       if(err) console.error(err);
       //     }
       //   )
       // });
@@ -213,7 +213,7 @@ router.put('/:_id/delete_student', utils.verifyAdmin, (req, res) => {
           {'$pull': { 'courses': c.id } }, 
           options, 
           (err, student) => {
-          if(err) throw err;
+          if(err) console.error(err);
         })
       });
 

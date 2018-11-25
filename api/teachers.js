@@ -12,7 +12,7 @@ import authenticate from '../middlewares/authenticate';
 router.get('/', authenticate, (req, res) => {
 	Teacher.find(req.query, (err, teachers) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(teachers);
 	})
@@ -51,7 +51,7 @@ router.post('/', authenticate, (req, res) => {
 	var body = req.body;
 	Teacher.create(body, function(err, teacher) {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(teacher);
 	})
@@ -70,7 +70,7 @@ router.put('/:_id', authenticate, (req, res) => {
 
 	Teacher.findOneAndUpdate(query, update, options, (err, teacher) =>{
 		if(err) {
-			throw err;
+			console.error(err);
     }
 		if(!teacher) {
       return res.status(404).json({
@@ -88,7 +88,7 @@ router.delete('/:_id', (req, res) => {
 	
 	Teacher.remove(query, (err, teachers) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(teachers);
 	})

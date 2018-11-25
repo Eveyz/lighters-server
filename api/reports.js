@@ -27,7 +27,7 @@ var upload = multer({storage: storage}).array('audios', 10);
 router.get('/', authenticate, (req, res) => {
 	Report.find(req.query, (err, reports) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(reports);
 	}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name').populate('student_id', 'lastname firstname');
@@ -38,7 +38,7 @@ router.get('/:_id', (req, res) => {
 	var query = {_id: req.params._id};
   
   Report.findOne(query, (err, report) => {
-    if(err) throw err;
+    if(err) console.error(err);
     res.json(report);
   }).populate('future_books');
 });
@@ -68,7 +68,7 @@ router.post('/', upload, authenticate, (req, res) => {
   
 	Report.create(_report, function(err, report) {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
     if(!report) {
       return res.status(404).json({
@@ -81,11 +81,10 @@ router.post('/', upload, authenticate, (req, res) => {
     const _month = report.course_date.substring(0, 7)
     const paycheck_query = {
       teacher_id: _teacher_id,
-      student_id: _student_id,
-      course_id: _course_id
+      month: _month
     }
-    Report.findOne(paycheck_query, (err, pc) => {
-      if(err) throw err;
+    Paycheck.findOne(paycheck_query, (err, pc) => {
+      if(err) console.error(err);
       if(!pc) {
         const _paycheck = {
           teacher_id: _teacher_id,
@@ -99,13 +98,14 @@ router.post('/', upload, authenticate, (req, res) => {
         })
       } else {
         pc.reports.push(report)
+        pc.save()
       }
     })
 
     // res
     report.populate('future_books', function(err, r) {
       if(err) {
-        throw err;
+        console.error(err);
       }
 
       res.json(r);
@@ -146,7 +146,7 @@ router.post('/:_id', upload, authenticate, (req, res) => {
 
 	Report.findOneAndUpdate(query, update, options, (err, report) =>{
 		if(err) {
-			throw err;
+			console.error(err);
     }
 		if(!report) {
       return res.status(404).json({
@@ -156,7 +156,7 @@ router.post('/:_id', upload, authenticate, (req, res) => {
     }
     report.populate('future_books', function(err, r) {
       if(err) {
-        throw err;
+        console.error(err);
       }
       res.json(r);
     });
@@ -185,7 +185,7 @@ router.post('/:_id/upload_audios', upload, authenticate, (req, res) => {
 
 	Report.findOneAndUpdate(query, update, options, (err, report) =>{
 		if(err) {
-			throw err;
+			console.error(err);
     }
     if(!report) {
       return res.status(404).json({
@@ -195,7 +195,7 @@ router.post('/:_id/upload_audios', upload, authenticate, (req, res) => {
     }
     report.populate('future_books', function(err, r) {
       if(err) {
-        throw err;
+        console.error(err);
       }
 
       res.json(r);
@@ -210,7 +210,7 @@ router.delete('/:_id', (req, res) => {
 	
 	Report.remove(query, (err, reports) => {
 		if(err) {
-			throw err;
+			console.error(err);
     }
     const response = {
       message: "Report successfully deleted"

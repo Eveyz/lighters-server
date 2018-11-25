@@ -19,7 +19,7 @@ router.get('/', utils.verifyAdmin, (req, res) => {
   // console.log(req.currentUser);
 	Course.find((err, courses) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(courses);
 	}).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
@@ -31,7 +31,7 @@ router.get('/:_id', authenticate, (req, res) => {
 	
 	Course.findOne(query, (err, course) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(course);
 	}).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
@@ -52,11 +52,11 @@ router.post('/', utils.verifyAdmin, (req, res) => {
   
 	Course.create(course, function(err, course) {
 		if(err) {
-			throw err;
+			console.error(err);
     }
     course.populate('books').populate('teachers', 'lastname firstname englishname').populate('students', function(err, c) {
       if(err) {
-        throw err;
+        console.error(err);
       }
       // append course into assign teacher
       c.teachers.forEach(id => {
@@ -96,11 +96,11 @@ router.put('/:_id', utils.verifyAdmin, (req, res) => {
 
 	Course.findOneAndUpdate(query, update, options, (err, course) =>{
 		if(err) {
-			throw err;
+			console.error(err);
     }
     course.populate('books').populate('teachers', 'lastname firstname englishname').populate('students', function(err, c) {
       if(err) {
-        throw err;
+        console.error(err);
       }
 
       if(_course.teachers) {
@@ -154,7 +154,7 @@ router.post('/:_id/post_student', utils.verifyAdmin, (req, res) => {
 
     course.populate('books').populate('teachers', 'lastname firstname englishname').populate('students', function(err, c) {
       if(err) {
-        throw err;
+        console.error(err);
       }
 
       // append course into assign teacher
@@ -204,7 +204,7 @@ router.put('/:_id/delete_student', utils.verifyAdmin, (req, res) => {
     
     course.populate('books').populate('teachers', 'lastname firstname englishname').populate('students', function(err, c) {
       if(err) {
-        throw err;
+        console.error(err);
       }
       // append course into assign teacher
       c.students.forEach(id => {

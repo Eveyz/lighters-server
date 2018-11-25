@@ -11,6 +11,10 @@ var paycheckSchema = new mongoose.Schema({
   month: { type: String, required: true },
   reports: [{type: mongoose.Schema.Types.ObjectId, ref: 'Report'}],
   attachments: [],
+  rate: Number,
+  rate_compensaton: Number,
+  compensatons: [{type: mongoose.Schema.Types.ObjectId, ref: 'Compensation'}],
+  amount: Number,
   paid: { type: Boolean, default: false },
   created_at: Date,
   updated_at: Date

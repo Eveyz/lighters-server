@@ -7,10 +7,11 @@ var mongoose = require('mongoose');
 var transactionSchema = new mongoose.Schema({
   teacher_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'},
   student_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Student'},
-  source: String,
+  src: String,
   dest: String,
-  description: String,
-  number: Number,
+  memo: String,
+  amount: Number,
+  status: { type: String, default: "IN" },
   attachments: [],
   created_at: Date,
   updated_at: Date

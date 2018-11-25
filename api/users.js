@@ -187,25 +187,25 @@ router.get('/admin/init', utils.verifyAdmin, (req, res) => {
   });
   Book.find({}, (err, books) => {
     if(err)
-      throw err;
+      console.error(err);
     _books = books;
     finished();
   }).populate('keywords');
   Course.find({}, (err, courses) => {
     if(err)
-      throw err;
+      console.error(err);
     _courses = courses;
     finished();
   }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
   Teacher.find({}, (err, teachers) => {
     if(err)
-      throw err;
+      console.error(err);
     _teachers = teachers;
     finished();
   }).populate('courses').populate('students');
   Student.find({}, (err, students) => {
     if(err)
-      throw err;
+      console.error(err);
     _students = students;
     finished();
   }).populate('courses').populate('teachers');

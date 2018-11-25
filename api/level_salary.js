@@ -16,7 +16,7 @@ router.get('/', authenticate, (req, res) => {
   // console.log(req.currentUser);
 	LevelSalary.find((err, entries) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(entries);
 	});
@@ -28,7 +28,7 @@ router.get('/:_id', authenticate, (req, res) => {
 	
 	LevelSalary.findOne(query, (err, entry) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(entry);
 	});
@@ -40,7 +40,7 @@ router.post('/', authenticate, (req, res) => {
 
 	LevelSalary.create(_entry, function(err, entry) {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(entry);
 	});
@@ -75,7 +75,7 @@ router.use('/:_id', (req, res) => {
 	LevelSalary.findOneAndUpdate(query, update, options, (err, entry) => {
     console.log(entry)
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(entry);
 	});

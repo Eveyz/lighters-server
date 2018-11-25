@@ -18,7 +18,7 @@ router.post('/query_courses', authenticate, (req, res) => {
 
 	Schedule.find(query, (err, schedules) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(schedules);
 	});
@@ -30,7 +30,7 @@ router.get('/:_id', authenticate, (req, res) => {
 	
 	Schedule.findOne(query, (err, schedule) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(schedule);
 	});
@@ -42,7 +42,7 @@ router.post('/', authenticate, (req, res) => {
   // console.log(req.currentUser);
 	Schedule.create(body, function(err, schedule) {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(schedule);
 	});
@@ -76,7 +76,7 @@ router.put('/:_id', (req, res) => {
 
 	Schedule.findOneAndUpdate(query, update, options, (err, scheudle) =>{
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(scheudle);
 	});

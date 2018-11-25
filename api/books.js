@@ -29,7 +29,7 @@ router.get('/', authenticate, (req, res) => {
   // console.log(req.currentUser);
 	Book.find((err, books) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(books);
 	}).populate('keywords');
@@ -41,7 +41,7 @@ router.get('/:_id', authenticate, (req, res) => {
 	
 	Book.findOne(query, (err, book) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(book);
 	}).populate('keywords');
@@ -61,7 +61,7 @@ router.post('/', upload.single("file"), authenticate, (req, res) => {
 
 	Book.create(_book, function(err, book) {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(book);
 	});
@@ -95,7 +95,7 @@ router.use('/:_id', (req, res) => {
 
 	Book.findOneAndUpdate(query, update, options, (err, book) =>{
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(book);
 	}).populate('keywords');

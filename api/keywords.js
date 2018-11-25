@@ -15,7 +15,7 @@ router.get('/', authenticate, (req, res) => {
   // console.log(req.currentUser);
 	Keyword.find((err, keywords) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(keywords);
 	});
@@ -27,7 +27,7 @@ router.get('/:_id', authenticate, (req, res) => {
 	
 	Keyword.findOne(query, (err, keyword) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(keyword);
 	});
@@ -39,7 +39,7 @@ router.post('/', authenticate, (req, res) => {
   // console.log(req.currentUser);
 	Keyword.create(body, function(err, keyword) {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(keyword);
 	});
@@ -51,7 +51,7 @@ router.delete('/:_id', (req, res) => {
 	
 	Keyword.remove(query, (err, keywords) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(keywords);
 	});
@@ -70,7 +70,7 @@ router.use('/:_id', (req, res) => {
 
 	Keyword.findOneAndUpdate(query, update, options, (err, keyword) =>{
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(keyword);
 	});

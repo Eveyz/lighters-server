@@ -16,6 +16,9 @@ const reportsAPI = require("./api/reports");
 const keywordsAPI = require("./api/keywords");
 const schedulesAPI = require("./api/schedule");
 const levelSalaryAPI = require("./api/level_salary");
+const paychecksAPI = require("./api/paycheck");
+const compensationsAPI = require("./api/compensation");
+const transactionsAPI = require("./api/transaction");
 
 const server = express();
 
@@ -38,6 +41,9 @@ server.use('/reports', reportsAPI);
 server.use('/keywords', keywordsAPI);
 server.use('/schedules', schedulesAPI);
 server.use('/level_salaries', levelSalaryAPI);
+server.use('/paychecks', paychecksAPI);
+server.use('/compensations', compensationsAPI);
+server.use('/transactions', transactionsAPI);
 
 /* MongoDB connection 
  * @author: znz

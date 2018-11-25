@@ -15,7 +15,7 @@ router.get('/', authenticate, (req, res) => {
 
 	Student.find((err, students) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(students);
 	})
@@ -67,7 +67,7 @@ router.post('/', authenticate, (req, res) => {
 
 	Student.create(student, (err, student) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(student);
 	})
@@ -79,7 +79,7 @@ router.delete('/:_id', (req, res) => {
 	
 	Student.remove(query, (err, students) => {
 		if(err) {
-			throw err;
+			console.error(err);
 		}
 		res.json(students);
 	})
@@ -98,7 +98,7 @@ router.put('/:_id', authenticate, (req, res) => {
 
 	Student.findOneAndUpdate(query, update, options, (err, student) =>{
 		if(err) {
-			throw err;
+			console.error(err);
     }
 		if(!student) {
       return res.status(404).json({

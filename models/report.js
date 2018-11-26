@@ -9,6 +9,7 @@ var reportSchema = new mongoose.Schema({
   course_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Course'},
   student_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Student'},
   situation: String,
+  reason: String,
   course_date: String,
   duration: Number,
   report_number: Number,

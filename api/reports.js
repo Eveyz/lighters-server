@@ -30,7 +30,7 @@ router.get('/', authenticate, (req, res) => {
 			console.error(err);
 		}
 		res.json(reports);
-	}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name').populate('student_id', 'lastname firstname');
+	}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name').populate('student_id', 'lastname firstname').populate('future_books');
 });
 
 /* Get Report by id */
@@ -81,7 +81,8 @@ router.post('/', upload, authenticate, (req, res) => {
     const _month = report.course_date.substring(0, 7)
     const paycheck_query = {
       teacher_id: _teacher_id,
-      month: _month
+      month: _month,
+      paid: false
     }
     Paycheck.findOne(paycheck_query, (err, pc) => {
       if(err) console.error(err);
@@ -91,7 +92,8 @@ router.post('/', upload, authenticate, (req, res) => {
           student_id: _student_id,
           course_id: _course_id,
           month: _month,
-          reports: [report]
+          reports: [report],
+          memo: "老师工资"
         }
         Paycheck.create(_paycheck, (err, paycheck) => {
           if(err) console.error(err);
@@ -109,7 +111,7 @@ router.post('/', upload, authenticate, (req, res) => {
       }
 
       res.json(r);
-    });
+    }).populate('future_books');
 
 	});
 });
@@ -118,24 +120,28 @@ router.post('/', upload, authenticate, (req, res) => {
 router.post('/:_id', upload, authenticate, (req, res) => {
   let _report = JSON.parse(req.body.report);
 
-  req.files.forEach(file => {
-    let _file = {
-      originalname: file.originalname,
-      filename: file.filename,
-      path: file.path
-    };
-    if(_report.audios_files.indexOf(_file) === -1) {
-      _report.audios_files.push(_file);
-    }
-  });
-  _report.audios = [];
-
-  _report.removedFiles.forEach(file => {
-    fs.unlink(file.path, (err) => {
-      if(err) console.error(err);
-      console.log(`${file.filename} was deleted`);
+  if(req.files) {
+    req.files.forEach(file => {
+      let _file = {
+        originalname: file.originalname,
+        filename: file.filename,
+        path: file.path
+      };
+      if(_report.audios_files.indexOf(_file) === -1) {
+        _report.audios_files.push(_file);
+      }
     });
-  })
+    _report.audios = [];
+    
+    if(_report.removedFiles) {
+      _report.removedFiles.forEach(file => {
+        fs.unlink(file.path, (err) => {
+          if(err) console.error(err);
+          console.log(`${file.filename} was deleted`);
+        });
+      })
+    }
+  }
 
   let query = {_id: req.params._id};
 	let update = {

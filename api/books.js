@@ -2,19 +2,16 @@
  * @author: znz
 */
 
+const fs = require('fs');
 const express = require('express');
-const path = require('path');
 const router = express.Router();
 const Book = require('../models/book');
-const Keyword = require('../models/keyword');
-const jwt = require('jsonwebtoken');
-const config = require('../config');
 const multer  = require('multer');
 import authenticate from '../middlewares/authenticate';
 
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, 'uploads/books')
+    callback(null, 'public/books/uploads')
   },
   filename: (req, file, callback) => {
     let ext = file.originalname.split('.').pop();
@@ -56,7 +53,7 @@ router.post('/', upload.single("file"), authenticate, (req, res) => {
 			originalname: file.originalname,
       filename: file.filename,
       path: file.path
-		}
+    }
 	}
 
 	Book.create(_book, function(err, book) {
@@ -65,6 +62,41 @@ router.post('/', upload.single("file"), authenticate, (req, res) => {
 		}
 		res.json(book);
 	});
+});
+
+/* Update Book */
+router.put('/:_id', upload.single("file"), authenticate, (req, res) => {
+  let _book = JSON.parse(req.body.book);
+  let prev_book = _book.prevFile
+	const file = req.file;
+	if(file) {
+		_book.file = {
+			originalname: file.originalname,
+      filename: file.filename,
+      path: file.path
+    }
+    
+    if(prev_book) {
+      fs.unlink(prev_book.path, (err) => {
+        if(err) console.error(err);
+        console.log(`${prev_book.filename} was deleted`);
+      });
+    }
+	}
+	let query = {_id: req.params._id};
+
+	let update = {
+		'$set': _book
+	};
+
+	let options = { new: true };
+
+	Book.findOneAndUpdate(query, update, options, (err, book) => {
+		if(err) {
+			console.error(err);
+		}
+		res.json(book);
+	}).populate('keywords');
 });
 
 /* Delete Book */
@@ -80,25 +112,6 @@ router.delete('/:_id', (req, res) => {
 		}
     res.json({success: true, msg: 'Book deleted.'});
   });
-});
-
-/* Update Book */
-router.use('/:_id', (req, res) => {
-	let _book = req.body;
-	let query = {_id: req.params._id};
-
-	let update = {
-		'$set': _book
-	};
-
-	let options = { new: true };
-
-	Book.findOneAndUpdate(query, update, options, (err, book) =>{
-		if(err) {
-			console.error(err);
-		}
-		res.json(book);
-	}).populate('keywords');
 });
 
 module.exports = router;

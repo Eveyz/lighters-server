@@ -4,10 +4,8 @@
 
 const fs = require('fs');
 const express = require('express');
-const path = require('path');
 const router = express.Router();
 const Report = require('../models/report');
-const Keyword = require('../models/keyword');
 const Paycheck = require('../models/paycheck');
 const mongoose = require('mongoose');
 const multer  = require('multer');

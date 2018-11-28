@@ -90,7 +90,23 @@ router.put('/:_id', utils.verifyAdmin, (req, res) => {
 	// if the field doesn't exist $set will set a new field
 	let update = {
 		'$set': _course
-	};
+  };
+  
+  // remove course from previous course
+  Course.findOne(query, (err, course) => {
+		if(err) {
+			console.error(err);
+    }
+    course.teachers.forEach((t) => {
+      Teacher.findOne({_id: t._id}, (err, teacher) => {
+        if(err) {
+          console.error(err);
+        }
+        teacher.courses.pull(course._id)
+        teacher.save()
+      })
+    })
+  })
 
 	var options = { new: true }; // newly updated record
 
@@ -98,6 +114,7 @@ router.put('/:_id', utils.verifyAdmin, (req, res) => {
 		if(err) {
 			console.error(err);
     }
+
     course.populate('books').populate('teachers', 'lastname firstname englishname').populate('students', function(err, c) {
       if(err) {
         console.error(err);
@@ -168,18 +185,6 @@ router.post('/:_id/post_student', utils.verifyAdmin, (req, res) => {
           }
         )
       });
-
-      // add students to teacher
-      // c.teachers.forEach(id => {
-      //   Teacher.findOneAndUpdate(
-      //     {_id: id},
-      //     {'$addToSet': { 'student': id }},
-      //     options,
-      //     (err, teacher) => {
-      //       if(err) console.error(err);
-      //     }
-      //   )
-      // });
 
       res.json(c);
     });

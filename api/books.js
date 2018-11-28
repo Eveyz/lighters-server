@@ -109,7 +109,15 @@ router.delete('/:_id', (req, res) => {
 		}
 		if (!book) {
 			return res.status(404).json({success: false, msg: 'Book not found'});
-		}
+    }
+    if(book.file && book.file.path) {
+      fs.unlink(book.file.path, (err) => {
+        if(err) console.error(err);
+        console.log(`${book.file.filename} was deleted`);
+      });
+    } else {
+      console.log("no pdf file found");
+    }
     res.json({success: true, msg: 'Book deleted.'});
   });
 });

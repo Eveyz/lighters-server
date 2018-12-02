@@ -8,7 +8,7 @@ const router = express.Router();
 const Student = require('../models/student');
 const Report = require('../models/report');
 const mongoose = require('mongoose');
-import authenticate from '../middlewares/authenticate';
+const authenticate = require('../middlewares/authenticate');
 
 /* Get Students */
 router.get('/', authenticate, (req, res) => {

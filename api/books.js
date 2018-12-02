@@ -7,7 +7,7 @@ const express = require('express');
 const router = express.Router();
 const Book = require('../models/book');
 const multer  = require('multer');
-import authenticate from '../middlewares/authenticate';
+const authenticate = require('../middlewares/authenticate');
 
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
@@ -42,6 +42,24 @@ router.get('/:_id', authenticate, (req, res) => {
 		}
 		res.json(book);
 	}).populate('keywords');
+});
+
+/* View Book Pdf content */
+router.get('/:_id/view', authenticate, (req, res) => {
+	let query = {_id: req.params._id};
+	let tempFile = "";
+	Book.findOne(query, (err, book) => {
+		if(err) console.error(err);
+		if(!book.file) {
+			res.sendStatus(404)
+		} else {
+			tempFile = book.file.path
+			fs.readFile(tempFile, (err,data) => {
+				 res.contentType("application/pdf");
+				 res.send(data);
+			});
+		}
+	})
 });
 
 /* Create Books */

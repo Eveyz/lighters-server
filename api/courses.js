@@ -12,7 +12,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const utils = require('../utils');
 const mongoose = require('mongoose');
-import authenticate from '../middlewares/authenticate';
+const authenticate = require('../middlewares/authenticate');
 
 /* Get Books */
 router.get('/', utils.verifyAdmin, (req, res) => {

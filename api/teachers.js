@@ -6,7 +6,7 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 const Teacher = require('../models/teacher');
-import authenticate from '../middlewares/authenticate';
+const authenticate = require('../middlewares/authenticate');
 
 /* Get Teachers */
 router.get('/', authenticate, (req, res) => {

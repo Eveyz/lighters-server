@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const User = require('../models/user');
 
-export default (req, res, next) => {
+const Authenticate = (req, res, next) => {
   const authorizationHeader = req.headers['authorization'];
   let token;
   if(authorizationHeader) {
@@ -33,3 +33,5 @@ export default (req, res, next) => {
     next();
   }
 }
+
+module.exports = Authenticate;

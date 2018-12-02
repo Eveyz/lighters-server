@@ -6,7 +6,7 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 const Paycheck = require('../models/paycheck');
-import authenticate from '../middlewares/authenticate';
+const authenticate = require('../middlewares/authenticate');
 
 /* Get Paychecks */
 router.get('/', authenticate, (req, res) => {

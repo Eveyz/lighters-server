@@ -9,7 +9,7 @@ const Report = require('../models/report');
 const Paycheck = require('../models/paycheck');
 const mongoose = require('mongoose');
 const multer  = require('multer');
-import authenticate from '../middlewares/authenticate';
+const authenticate = require('../middlewares/authenticate');
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
     callback(null, 'public/audios/uploads')

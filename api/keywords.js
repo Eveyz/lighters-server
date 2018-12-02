@@ -8,7 +8,7 @@ const router = express.Router();
 const Keyword = require('../models/keyword');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-import authenticate from '../middlewares/authenticate';
+const authenticate = require('../middlewares/authenticate');
 
 /* Get Keywords */
 router.get('/', authenticate, (req, res) => {

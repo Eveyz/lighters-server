@@ -6,7 +6,7 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 const Transaction = require('../models/transaction');
-import authenticate from '../middlewares/authenticate';
+const authenticate = require('../middlewares/authenticate');
 
 /* Get Transactions */
 router.get('/', authenticate, (req, res) => {

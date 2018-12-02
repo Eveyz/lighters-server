@@ -9,7 +9,7 @@ const LevelSalary = require('../models/level_salary');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const multer  = require('multer');
-import authenticate from '../middlewares/authenticate';
+const authenticate = require('../middlewares/authenticate');
 
 /* Get all entry */
 router.get('/', authenticate, (req, res) => {

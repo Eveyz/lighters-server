@@ -6,7 +6,7 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 const Compensation = require('../models/compensation');
-import authenticate from '../middlewares/authenticate';
+const authenticate = require('../middlewares/authenticate');
 
 /* Get Compensations */
 router.get('/', authenticate, (req, res) => {

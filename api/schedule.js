@@ -8,7 +8,7 @@ const router = express.Router();
 const Schedule = require('../models/schedule');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-import authenticate from '../middlewares/authenticate';
+const authenticate = require('../middlewares/authenticate');
 
 /* Get Schedules */
 router.post('/query_courses', authenticate, (req, res) => {

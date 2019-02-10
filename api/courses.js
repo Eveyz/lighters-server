@@ -40,7 +40,7 @@ router.get('/:_id', authenticate, (req, res) => {
 /* Create courses */
 router.post('/', utils.verifyAdmin, (req, res) => {
   var course = req.body;
-
+  
   if(course.teachers.length > 0) {
     let mongoose_ids = [];
     course.teachers.forEach(id => {

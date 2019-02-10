@@ -4,5 +4,6 @@
 /public/books/uploads
 /pages
 /uploads
+/build
 
 .DS_Store

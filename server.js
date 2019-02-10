@@ -51,6 +51,7 @@ server.use('/transactions', transactionsAPI);
 var db = config.db;
 
 if (process.env.NODE_ENV === "production") {
+  console.log('Production mode');
   server.use(express.static(path.join(__dirname, '/build')));
 
   server.get('*', (req, res) => {

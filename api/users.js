@@ -28,7 +28,13 @@ router.post('/authenticate', (req, res) => {
       }
 
       // Don't include sensitive information in the token
-      const userTokenData = {id: user.id, username: user.username, email: user.email, identity: user.identity};
+      const userTokenData = {
+        id: user.id, 
+        username: user.username, 
+        email: user.email, 
+        identity: user.identity, 
+        status: user.status
+      };
 
       user.validPassword(req.body.password, function(err, isMatch) {
         if(err) console.error(err);
@@ -137,7 +143,13 @@ router.post('/', (req, res) => {
 
     newUser.save((err) => {
       if(err) console.error(err);
-      const userTokenData = {id: newUser.id, username: newUser.username, email: newUser.email, identity: newUser.identity};
+      const userTokenData = {
+        id: newUser.id, 
+        username: newUser.username, 
+        email: newUser.email, 
+        identity: newUser.identity, 
+        status: newUser.status
+      };
       jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: '2h'}, (err, token) => {
         res.json({
           token

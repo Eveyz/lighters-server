@@ -1,5 +1,7 @@
 /* 
  * @author: znz
+ * 
+ * user status => RESET_REQUIRED -> UNVERIFIED -> VERIFIED
 */
 
 let mongoose = require('mongoose');
@@ -9,11 +11,12 @@ var userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   // firstname: { type: String, required: true, unique: true },
   // lastname: { type: String, required: true, unique: true },
-  username: { type: String, required: false, unique: false },
+  username: { type: String, required: true, unique: true },
   phone: { type: String, required: false }, 
   wechat: { type: String, require: false },
   identity: { type: String, require: false },  
-  status: { type: String, required: true, default: "pending" },
+  status: { type: String, required: true, default: "UNVERIFIED" },
+  adminCreated: { type: Boolean, default: false },
   password: { type: String, required: true },
   passwordCon: { type: String, required: true },
   admin: { type: Boolean, default: false },

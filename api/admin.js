@@ -16,16 +16,17 @@ router.post('/createTeacher', utils.verifyAdmin, (req, res) => {
   const user = {
     email: data.email,
     identity: "teacher",
+    username: data.username,
     password: data.password,
-    passwordCon: data.passwordCon
+    passwordCon: data.passwordCon,
+    adminCreated: true,
+    status: "RESET_REQUIRED"
   }
   let teacher = data.teacher;
 
   User.create(user, (err, user) => {
     if(err) console.log(err);
     teacher.user_id = user.id;
-    teacher.adminCreated = true;
-    teacher.status = "adminCreated";
 
     Teacher.create(teacher, function(err, teacher) {
       if(err) {

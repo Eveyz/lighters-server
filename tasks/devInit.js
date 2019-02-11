@@ -21,6 +21,7 @@ function createAdmin() {
   User.create({
     email: 'admin@lighters.com',
     admin: true,
+    username: "admin",
     identity: "admin",
     status: "admin",
     password: 'saiop147',
@@ -48,11 +49,11 @@ const createWords = async function() {
       });
       ky.save(function(err) {
         if(err) console.error(err);
-        console.log("new ky", ky._id);
+        // console.log("new ky", ky._id);
         keywords.push(ky._id);
       })
     } else {
-      console.log("old ky", ky._id);
+      // console.log("old ky", ky._id);
       keywords.push(ky._id);
     }
   };
@@ -86,6 +87,7 @@ function createStudent() {
     var email = 'student' + i + '@lighters.com';
     let u = new User({
       email: email,
+      username: `student${i}`,
       identity: 'student',
       password: 'saiop147',
       passwordCon: 'saiop147'
@@ -109,6 +111,7 @@ function createTeacher() {
     var email = 'teacher' + i + '@lighters.com';
     let u = new User({
       email: email,
+      username: `teacher${i}`,
       identity: 'teacher',
       password: 'saiop147',
       passwordCon: 'saiop147'

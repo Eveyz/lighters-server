@@ -34,6 +34,7 @@ var teacherSchema = new mongoose.Schema({
   resume: String,
   level: { type: Number, default: 1 },
   status: { type: String, default: "pending" },
+  temporary: String,
   consent: { type: Boolean, default: false },
   certificates: [],
   rate: Number,

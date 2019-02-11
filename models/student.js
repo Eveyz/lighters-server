@@ -34,6 +34,7 @@ var studentSchema = new mongoose.Schema({
   age: Number,
   consent: { type: Boolean, default: false },
   status: { type: String, default: "pending" },
+  temporary: String,
   recording: [],
   teachers: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Teacher' } ],
   courses: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Course' } ],

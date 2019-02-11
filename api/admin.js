@@ -27,12 +27,44 @@ router.post('/createTeacher', utils.verifyAdmin, (req, res) => {
   User.create(user, (err, user) => {
     if(err) console.log(err);
     teacher.user_id = user.id;
+    teacher.status = "RESET_REQUIRED";
+    teacher.temporary = data.username;
 
     Teacher.create(teacher, function(err, teacher) {
       if(err) {
         console.error(err);
       }
       res.json(teacher.email);
+    })
+
+  })
+});
+
+/* Create Student */
+router.post('/createStudent', utils.verifyAdmin, (req, res) => {
+  let data = req.body;
+  const user = {
+    email: data.email,
+    identity: "student",
+    username: data.username,
+    password: data.password,
+    passwordCon: data.passwordCon,
+    adminCreated: true,
+    status: "RESET_REQUIRED"
+  }
+  let student = data.student;
+
+  User.create(user, (err, user) => {
+    if(err) console.log(err);
+    student.user_id = user.id;
+    student.status = "RESET_REQUIRED";
+    student.temporary = data.username;
+
+    Student.create(student, function(err, student) {
+      if(err) {
+        console.error(err);
+      }
+      res.json(student.email);
     })
 
   })

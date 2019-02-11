@@ -7,6 +7,7 @@ const MongoClient = require("mongodb").MongoClient;
 
 const config = require("./config");
 
+const adminAPI = require("./api/admin");
 const usersAPI = require("./api/users");
 const booksAPI = require("./api/books");
 const coursesAPI = require("./api/courses");
@@ -32,6 +33,7 @@ server.use(cookieParser());
 /* API 
  * @author: znz
 */
+server.use('/admin', adminAPI);
 server.use('/users', usersAPI);
 server.use('/books', booksAPI);
 server.use('/courses', coursesAPI);

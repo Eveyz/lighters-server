@@ -2,6 +2,8 @@
  * @author: znz
 */
 
+// status => adminCreated -> unverified -> verified -> pending <=> active
+
 var mongoose = require('mongoose');
 
 var teacherSchema = new mongoose.Schema({
@@ -32,6 +34,7 @@ var teacherSchema = new mongoose.Schema({
   resume: String,
   level: { type: Number, default: 1 },
   status: { type: String, default: "pending" },
+  adminCreated: { type: Boolean, default: false },
   consent: { type: Boolean, default: false },
   certificates: [],
   rate: Number,

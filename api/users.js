@@ -175,18 +175,7 @@ router.post('/:_id/activate', (req, res) => {
       user.save(function(err){
         if(err) return console.error(err);
         //user has been updated
-        const userTokenData = {
-          id: user.id, 
-          username: user.username, 
-          email: user.email, 
-          identity: user.identity, 
-          status: user.status
-        };
-        jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: '2h'}, (err, token) => {
-          res.json({
-            token
-          })
-        });
+        res.status(200).json({'msg': 'User activated!'});
       });
 
     })

@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const config = require('./config');
 const User = require('./models/user');
+const Teacher = require('./models/teacher');
+const Student = require('./models/student');
 
 // Format of token
 // Authorization: Bearer <access_token>
@@ -58,5 +60,5 @@ function verifyAdmin(req, res, next) {
 
 module.exports = {
   verifyToken: verifyToken,
-  verifyAdmin: verifyAdmin
+  verifyAdmin: verifyAdmin,
 }

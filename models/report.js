@@ -15,6 +15,7 @@ var reportSchema = new mongoose.Schema({
   report_number: Number,
   focus: Number,
   type: String,
+  course_content: String,
   tutor_comment: String,
   homework: String,
   start_time: String,

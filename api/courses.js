@@ -102,8 +102,10 @@ router.put('/:_id', utils.verifyAdmin, (req, res) => {
         if(err) {
           console.error(err);
         }
-        teacher.courses.pull(course._id)
-        teacher.save()
+        if(teacher) {
+          teacher.courses.pull(course._id)
+          teacher.save()
+        }
       })
     })
   })

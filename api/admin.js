@@ -27,7 +27,8 @@ router.post('/createTeacher', utils.verifyAdmin, (req, res) => {
   User.create(user, (err, user) => {
     if(err) console.log(err);
     teacher.user_id = user.id;
-    teacher.status = "RESET_REQUIRED";
+    // teacher.status = "RESET_REQUIRED";
+    teacher.status = "active";
     teacher.temporary = data.username;
 
     Teacher.create(teacher, function(err, teacher) {
@@ -57,7 +58,8 @@ router.post('/createStudent', utils.verifyAdmin, (req, res) => {
   User.create(user, (err, user) => {
     if(err) console.log(err);
     student.user_id = user.id;
-    student.status = "RESET_REQUIRED";
+    // student.status = "RESET_REQUIRED";
+    student.status = "active";
     student.temporary = data.username;
 
     Student.create(student, function(err, student) {

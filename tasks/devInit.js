@@ -24,8 +24,8 @@ function createAdmin() {
     username: "admin",
     identity: "admin",
     status: "admin",
-    password: 'saiop147',
-    passwordCon: 'saiop147'
+    password: 'lightersadmin',
+    passwordCon: 'lightersadmin'
   });
 }
 
@@ -132,9 +132,9 @@ function createTeacher() {
 
 const init = async function() {
   createAdmin();
-  createBooks();
-  createStudent();
-  createTeacher();
+  // createBooks();
+  // createStudent();
+  // createTeacher();
 }
 
 init();

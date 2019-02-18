@@ -16,14 +16,14 @@ const config = require('../config');
 const utils = require('../utils');
 
 router.post('/authenticate', (req, res) => {
-  if(req.body.email && req.body.password) {
-    User.findOne({ email: req.body.email }, function(err, user) {
+  if(req.body.username && req.body.password) {
+    User.findOne({ username: req.body.username }, function(err, user) {
       if(err) console.error(err);
       if(!user) {
         return res.status(404).json({
           error: true,
           status: 'error',
-          msg: '登录邮箱或者密码错误'
+          msg: '用户名或者密码错误'
         });
       }
 
@@ -156,6 +156,40 @@ router.post('/', (req, res) => {
         })
       });
     });
+	} else {
+    res.status(300).json({'error': 'Missing information'});
+  }
+
+});
+
+/* Activate User */
+router.post('/:_id/activate', (req, res) => {
+	if(req.body.id && req.body.username && req.body.password && req.body.passwordCon) {
+    User.findOne({ _id: req.body.id }, function(err, user) {
+      if(err) console.error(err);
+      user.username = req.body.username;
+      user.password = req.body.password;
+      user.passwordCon = req.body.passwordCon;
+      user.status = "active";
+
+      user.save(function(err){
+        if(err) return console.error(err);
+        //user has been updated
+        const userTokenData = {
+          id: user.id, 
+          username: user.username, 
+          email: user.email, 
+          identity: user.identity, 
+          status: user.status
+        };
+        jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: '2h'}, (err, token) => {
+          res.json({
+            token
+          })
+        });
+      });
+
+    })
 	} else {
     res.status(300).json({'error': 'Missing information'});
   }

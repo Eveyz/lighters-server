@@ -49,16 +49,22 @@ router.get('/:_id/view', authenticate, (req, res) => {
 	let query = {_id: req.params._id};
 	let tempFile = "";
 	Book.findOne(query, (err, book) => {
-		if(err) console.error(err);
-		if(!book.file) {
-			res.sendStatus(404)
-		} else {
-			tempFile = book.file.path
-			fs.readFile(tempFile, (err,data) => {
-				 res.contentType("application/pdf");
-				 res.send(data);
-			});
-		}
+    if(err) console.error(err);
+    
+    if(!book) {
+      res.json({success: false, msg: 'Book not found.'});
+    } else {
+      if(!book.file) {
+        res.sendStatus(404)
+      } else {
+        tempFile = book.file.path
+        fs.readFile(tempFile, (err,data) => {
+           res.contentType("application/pdf");
+           res.send(data);
+        });
+      }
+    }
+
 	})
 });
 

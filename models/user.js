@@ -17,6 +17,7 @@ var userSchema = new mongoose.Schema({
   identity: { type: String, require: false },  
   status: { type: String, required: true, default: "UNVERIFIED" },
   adminCreated: { type: Boolean, default: false },
+  temporaryPassword: { type: String, required: false },
   password: { type: String, required: true },
   passwordCon: { type: String, required: true },
   admin: { type: Boolean, default: false },

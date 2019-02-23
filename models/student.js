@@ -9,6 +9,7 @@ var studentSchema = new mongoose.Schema({
   pemail: String,
   pwechat: String,
   pqq: String,
+  systemid: String,
   firstname: String,
   lastname: String,
   englishname: String,

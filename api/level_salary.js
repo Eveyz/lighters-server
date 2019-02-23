@@ -73,7 +73,6 @@ router.use('/:_id', (req, res) => {
 	let options = { new: true }; // newly updated record
 
 	LevelSalary.findOneAndUpdate(query, update, options, (err, entry) => {
-    console.log(entry)
 		if(err) {
 			console.error(err);
 		}

@@ -164,10 +164,10 @@ router.post('/', (req, res) => {
 
 /* Activate User */
 router.post('/:_id/activate', (req, res) => {
-	if(req.body.id && req.body.username && req.body.password && req.body.passwordCon) {
+	if(req.body.id && req.body.email && req.body.password && req.body.passwordCon) {
     User.findOne({ _id: req.body.id }, function(err, user) {
       if(err) console.error(err);
-      user.username = req.body.username;
+      user.email = req.body.email;
       user.password = req.body.password;
       user.passwordCon = req.body.passwordCon;
       user.status = "active";

@@ -22,7 +22,7 @@ router.get('/', authenticate, (req, res) => {
     populate: {
       path: 'course_id',
       model: 'Course',
-      select: 'name'
+      select: 'name course_rate type'
     }
   }).populate({
     path: 'reports',

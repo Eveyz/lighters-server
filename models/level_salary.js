@@ -7,6 +7,7 @@ var mongoose = require('mongoose');
 var levelSalarySchema = new mongoose.Schema({
   level: String,
   rate: Number,
+  type: String,
   created_at: Date,
   updated_at: Date
 });

@@ -13,62 +13,78 @@ const authenticate = require('../middlewares/authenticate');
 /* Create Teacher */
 router.post('/createTeacher', utils.verifyAdmin, (req, res) => {
   let data = req.body;
-  const user = {
-    email: data.email,
-    identity: "teacher",
-    username: data.username,
-    password: data.password,
-    passwordCon: data.passwordCon,
-    adminCreated: true,
-    status: "RESET_REQUIRED"
-  }
-  let teacher = data.teacher;
+  Teacher.countDocuments({}, function(err, count) {
+    if (err) { return handleError(err) }
 
-  User.create(user, (err, user) => {
-    if(err) console.log(err);
-    teacher.user_id = user.id;
-    // teacher.status = "RESET_REQUIRED";
-    teacher.status = "active";
-    teacher.temporary = data.username;
-
-    Teacher.create(teacher, function(err, teacher) {
-      if(err) {
-        console.error(err);
-      }
-      res.json(teacher.email);
+    let systemID = utils.getStudyID(count);
+    let teacherUsername = `T${(new Date()).getFullYear().toString().substr(-2)}${systemID}`;
+    const user = {
+      identity: "teacher",
+      username: teacherUsername,
+      email: `${data.temporaryPassword}@lighters.com`,
+      temporaryPassword: data.temporaryPassword,
+      password: data.password,
+      passwordCon: data.passwordCon,
+      adminCreated: true,
+      status: "RESET_REQUIRED"
+    }
+    let teacher = data.teacher;
+  
+    User.create(user, (err, user) => {
+      if(err) console.log(err);
+      teacher.user_id = user.id;
+      // teacher.status = "RESET_REQUIRED";
+      teacher.status = "active";
+      teacher.systemid = teacherUsername;
+      teacher.temporary = data.temporaryPassword;
+  
+      Teacher.create(teacher, function(err, teacher) {
+        if(err) {
+          console.error(err);
+        }
+        res.json(teacher.englishname);
+      })
+  
     })
-
-  })
+  });
 });
 
 /* Create Student */
 router.post('/createStudent', utils.verifyAdmin, (req, res) => {
   let data = req.body;
-  const user = {
-    email: data.email,
-    identity: "student",
-    username: data.username,
-    password: data.password,
-    passwordCon: data.passwordCon,
-    adminCreated: true,
-    status: "RESET_REQUIRED"
-  }
-  let student = data.student;
-
-  User.create(user, (err, user) => {
-    if(err) console.log(err);
-    student.user_id = user.id;
-    // student.status = "RESET_REQUIRED";
-    student.status = "active";
-    student.temporary = data.username;
-
-    Student.create(student, function(err, student) {
-      if(err) {
-        console.error(err);
-      }
-      res.json(student.email);
+  Student.countDocuments({}, function(err, count) {
+    if (err) { return handleError(err) }
+    
+    let systemID = utils.getStudyID(count);
+    let studentUsername = `S${(new Date()).getFullYear().toString().substr(-2)}${systemID}`;
+    const user = {
+      identity: "student",
+      email: `${data.temporaryPassword}@lighters.com`,
+      username: studentUsername,
+      temporaryPassword: data.temporaryPassword,
+      password: data.password,
+      passwordCon: data.passwordCon,
+      adminCreated: true,
+      status: "RESET_REQUIRED"
+    }
+    let student = data.student;
+  
+    User.create(user, (err, user) => {
+      if(err) console.log(err);
+      student.user_id = user.id;
+      // student.status = "RESET_REQUIRED";
+      student.status = "active";
+      student.systemid = studentUsername;
+      student.temporary = data.temporaryPassword;
+  
+      Student.create(student, function(err, student) {
+        if(err) {
+          console.error(err);
+        }
+        res.json(student.englishname);
+      })
+  
     })
-
   })
 });
 

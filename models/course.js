@@ -9,6 +9,7 @@ var courseSchema = new mongoose.Schema({
   student_id: Number,
   capacity: Number,
   course_hours: Number,
+  course_rate: { type: Number, default: 70 },
   name: String,
   level: String,
   code: String,

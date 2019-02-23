@@ -38,7 +38,7 @@ router.get('/:_id', (req, res) => {
   Report.findOne(query, (err, report) => {
     if(err) console.error(err);
     res.json(report);
-  }).populate('future_books');
+  }).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name').populate('student_id', 'lastname firstname englishname');
 });
 
 /* Create Report */

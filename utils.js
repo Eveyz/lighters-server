@@ -58,7 +58,26 @@ function verifyAdmin(req, res, next) {
   }
 }
 
+function getStudyID(number) {
+  let res;
+  let sum = parseInt(number) + 10;
+  console.log("sum: ", sum);
+  switch(true) {
+    case (sum < 100):
+      res = "0" + sum;
+      break;
+    case (sum < 1000):
+      res = sum.toString();
+      break;
+    default:
+      res = "010";
+      break;
+  }
+  return res;
+}
+
 module.exports = {
   verifyToken: verifyToken,
   verifyAdmin: verifyAdmin,
+  getStudyID: getStudyID,
 }

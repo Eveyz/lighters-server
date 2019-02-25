@@ -21,10 +21,10 @@ router.post('/createTeacher', utils.verifyAdmin, (req, res) => {
     const user = {
       identity: "teacher",
       username: teacherUsername,
-      email: `${data.temporaryPassword}@lighters.com`,
-      temporaryPassword: data.temporaryPassword,
-      password: data.password,
-      passwordCon: data.passwordCon,
+      email: `${teacherUsername}@lighters.com`,
+      temporaryPassword: teacherUsername,
+      password: teacherUsername,
+      passwordCon: teacherUsername,
       adminCreated: true,
       status: "RESET_REQUIRED"
     }
@@ -36,7 +36,7 @@ router.post('/createTeacher', utils.verifyAdmin, (req, res) => {
       // teacher.status = "RESET_REQUIRED";
       teacher.status = "active";
       teacher.systemid = teacherUsername;
-      teacher.temporary = data.temporaryPassword;
+      teacher.temporary = teacherUsername;
   
       Teacher.create(teacher, function(err, teacher) {
         if(err) {
@@ -59,11 +59,11 @@ router.post('/createStudent', utils.verifyAdmin, (req, res) => {
     let studentUsername = `S${(new Date()).getFullYear().toString().substr(-2)}${systemID}`;
     const user = {
       identity: "student",
-      email: `${data.temporaryPassword}@lighters.com`,
+      email: `${studentUsername}@lighters.com`,
       username: studentUsername,
-      temporaryPassword: data.temporaryPassword,
-      password: data.password,
-      passwordCon: data.passwordCon,
+      temporaryPassword: studentUsername,
+      password: studentUsername,
+      passwordCon: studentUsername,
       adminCreated: true,
       status: "RESET_REQUIRED"
     }
@@ -75,7 +75,7 @@ router.post('/createStudent', utils.verifyAdmin, (req, res) => {
       // student.status = "RESET_REQUIRED";
       student.status = "active";
       student.systemid = studentUsername;
-      student.temporary = data.temporaryPassword;
+      student.temporary = studentUsername;
   
       Student.create(student, function(err, student) {
         if(err) {

@@ -31,6 +31,77 @@ router.get('/', authenticate, (req, res) => {
 	}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name').populate('student_id', 'lastname firstname').populate('future_books');
 });
 
+/* Copy Report */
+router.get('/copy_report', authenticate, (req, res) => {
+  var _query = {_id: req.query.report_id};
+	Report.findOne(_query, (err, _report) => {
+		if(err) {
+			console.error(err);
+    }
+    if(!_report) {
+      console.error("Report not found")
+    }
+    const copy = {
+      teacher_id: req.query.teacher_id,
+      course_id: req.query.course_id,
+      student_id: req.query.student_id,
+      course_date: _report.course_date || "",
+      start_time: _report.start_time || "",
+      end_time: _report.end_time || "",
+      course_content: _report.course_content || [],
+      tutor_comment: _report.tutor_comment || "",
+      homework: _report.homework || "",
+      external_link: _report.external_link || "",
+      audios: _report.audios || [],
+      audios_files: _report.audios_files || [],
+      paid: _report.paid || false,
+      credit: _report.credit || 1,
+      status: _report.status || "active",
+      situation: _report.situation || "",
+      focus: _report.focus
+    }
+    Report.create(copy, function(err, report) {
+      if(err) {
+        console.error(err);
+      }
+      if(!report) {
+        return res.status(404).json({
+          error: true,
+          message: 'Report not found'
+        });
+      }
+  
+      // add report to paycheck
+      const _month = report.course_date.substring(0, 7)
+      const paycheck_query = {
+        teacher_id: report.teacher_id,
+        month: _month,
+        paid: false
+      }
+      Paycheck.findOne(paycheck_query, (err, pc) => {
+        if(err) console.error(err);
+        if(!pc) {
+          const _paycheck = {
+            teacher_id: report.teacher_id,
+            student_id: report.student_id,
+            course_id: report.course_id,
+            month: _month,
+            reports: [report],
+            memo: "老师工资"
+          }
+          Paycheck.create(_paycheck, (err, paycheck) => {
+            if(err) console.error(err);
+          })
+        } else {
+          pc.reports.push(report)
+          pc.save()
+        }
+      })
+      res.json(report);
+    });
+	});
+});
+
 /* Get Report by id */
 router.get('/:_id', (req, res) => {
 	var query = {_id: req.params._id};
@@ -217,6 +288,7 @@ router.delete('/:_id', (req, res) => {
 			console.error(err);
     }
     const response = {
+      success: true,
       message: "Report successfully deleted"
     };
 		res.json(response);

@@ -8,6 +8,7 @@ var levelSalarySchema = new mongoose.Schema({
   level: String,
   rate: Number,
   type: String,
+  course_level: String,
   created_at: Date,
   updated_at: Date
 });

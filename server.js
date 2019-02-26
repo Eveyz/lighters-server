@@ -20,6 +20,7 @@ const levelSalaryAPI = require("./api/level_salary");
 const paychecksAPI = require("./api/paycheck");
 const compensationsAPI = require("./api/compensation");
 const transactionsAPI = require("./api/transaction");
+const tuitionsAPI = require("./api/tuition");
 
 const server = express();
 
@@ -46,6 +47,7 @@ server.use('/level_salaries', levelSalaryAPI);
 server.use('/paychecks', paychecksAPI);
 server.use('/compensations', compensationsAPI);
 server.use('/transactions', transactionsAPI);
+server.use('/tuitions', tuitionsAPI);
 
 /* MongoDB connection 
  * @author: znz

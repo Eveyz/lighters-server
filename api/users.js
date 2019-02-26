@@ -23,7 +23,7 @@ router.post('/authenticate', (req, res) => {
         return res.status(404).json({
           error: true,
           status: 'error',
-          msg: '用户名或者密码错误'
+          msg: '用户名错误'
         });
       }
 
@@ -39,6 +39,13 @@ router.post('/authenticate', (req, res) => {
       user.validPassword(req.body.password, function(err, isMatch) {
         if(err) console.error(err);
         console.log('Password:', isMatch);
+        if(!isMatch) {
+          return res.status(404).json({
+            success: false,
+            status: 'error',
+            msg: '密码错误'
+          });
+        }
       });
 
       jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: '2h'}, (err, token) => {
@@ -190,7 +197,7 @@ router.get('/from/token', utils.verifyToken, (req, res) => {
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token;
   if (!token) {
-    return res.status(400).json({message: 'Must pass token'});
+    return res.status(400).json({msg: 'Must pass token'});
   }
   jwt.verify(token, config.jwtSecret, (err, tokenData) => {
     if(err) {
@@ -256,7 +263,7 @@ router.get('/admin/init', utils.verifyAdmin, (req, res) => {
 //     if(err) {
 //       res.sendStatus(403).json({
 //         success: false,
-//         message: 'Please register or login in.'
+//         msg: 'Please register or login in.'
 //       });
 //     } else {
 //       req.user = user; //set the user to req so other routes can use it

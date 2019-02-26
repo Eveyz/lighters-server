@@ -57,7 +57,7 @@ router.put('/:_id', authenticate, (req, res) => {
 		if(!transaction) {
       return res.status(404).json({
         error: true,
-        message: 'Transaction not found'
+        msg: 'Transaction not found'
       });
     }
     res.json(transaction);

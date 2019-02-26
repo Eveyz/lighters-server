@@ -90,7 +90,7 @@ router.post('/', authenticate, (req, res) => {
       model: 'Student',
       select: 'firstname lastname'
     }
-  }).populate('teacher_id', 'firstname lastname');;
+  }).populate('teacher_id', 'firstname lastname');
 });
 
 /* Update Paycheck */
@@ -111,7 +111,7 @@ router.put('/:_id', authenticate, (req, res) => {
 		if(!paycheck) {
       return res.status(404).json({
         error: true,
-        message: 'Paycheck not found'
+        msg: 'Paycheck not found'
       });
     }
     res.json(paycheck);

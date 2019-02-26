@@ -50,10 +50,10 @@ userSchema.methods.generateHash = function(password) {
 };
 
 // checking if password is valid
-userSchema.methods.validPassword = function(password) {
-  bcrypt.compareSync(password, this.password, function(err, isMatch) {
+userSchema.methods.validPassword = function(candidatePassword, callback) {
+  bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
     if(err) console.error(err);
-    isMatch = true;
+    callback(null, isMatch);
   });
 };
 

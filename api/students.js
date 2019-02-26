@@ -103,7 +103,7 @@ router.put('/:_id', authenticate, (req, res) => {
 		if(!student) {
       return res.status(404).json({
         error: true,
-        message: 'Student not found'
+        msg: 'Student not found'
       });
     }
     res.json(student);

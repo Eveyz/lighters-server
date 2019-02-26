@@ -7,6 +7,7 @@ var mongoose = require('mongoose');
 var transactionSchema = new mongoose.Schema({
   teacher_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'},
   student_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Student'},
+  tuition_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Tuition'},
   src: String,
   dest: String,
   memo: String,

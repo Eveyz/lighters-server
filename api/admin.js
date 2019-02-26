@@ -106,7 +106,7 @@ router.put('/:_id', authenticate, (req, res) => {
 		if(!teacher) {
       return res.status(404).json({
         error: true,
-        message: 'Teacher not found'
+        msg: 'Teacher not found'
       });
     }
     res.json(teacher);

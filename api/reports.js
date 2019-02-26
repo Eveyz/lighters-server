@@ -7,6 +7,7 @@ const express = require('express');
 const router = express.Router();
 const Report = require('../models/report');
 const Paycheck = require('../models/paycheck');
+const Tuition = require('../models/tuition');
 const mongoose = require('mongoose');
 const multer  = require('multer');
 const authenticate = require('../middlewares/authenticate');
@@ -67,36 +68,16 @@ router.get('/copy_report', authenticate, (req, res) => {
       if(!report) {
         return res.status(404).json({
           error: true,
-          message: 'Report not found'
+          msg: 'Report not found'
         });
       }
   
       // add report to paycheck
-      const _month = report.course_date.substring(0, 7)
-      const paycheck_query = {
-        teacher_id: report.teacher_id,
-        month: _month,
-        paid: false
-      }
-      Paycheck.findOne(paycheck_query, (err, pc) => {
-        if(err) console.error(err);
-        if(!pc) {
-          const _paycheck = {
-            teacher_id: report.teacher_id,
-            student_id: report.student_id,
-            course_id: report.course_id,
-            month: _month,
-            reports: [report],
-            memo: "老师工资"
-          }
-          Paycheck.create(_paycheck, (err, paycheck) => {
-            if(err) console.error(err);
-          })
-        } else {
-          pc.reports.push(report)
-          pc.save()
-        }
-      })
+      report.addToPaycheck()
+
+      // decrease course hour for student tuition
+      report.decreaseTuitionCourseHour()
+
       res.json(report);
     });
 	});
@@ -142,36 +123,15 @@ router.post('/', upload, authenticate, (req, res) => {
     if(!report) {
       return res.status(404).json({
         error: true,
-        message: 'Report not found'
+        msg: 'Report not found'
       });
     }
 
     // add report to paycheck
-    const _month = report.course_date.substring(0, 7)
-    const paycheck_query = {
-      teacher_id: _teacher_id,
-      month: _month,
-      paid: false
-    }
-    Paycheck.findOne(paycheck_query, (err, pc) => {
-      if(err) console.error(err);
-      if(!pc) {
-        const _paycheck = {
-          teacher_id: _teacher_id,
-          student_id: _student_id,
-          course_id: _course_id,
-          month: _month,
-          reports: [report],
-          memo: "老师工资"
-        }
-        Paycheck.create(_paycheck, (err, paycheck) => {
-          if(err) console.error(err);
-        })
-      } else {
-        pc.reports.push(report)
-        pc.save()
-      }
-    })
+    report.addToPaycheck()
+
+    // decrease course hour for student tuition
+    report.decreaseTuitionCourseHour()
 
     // res
     report.populate('future_books', function(err, r) {
@@ -226,9 +186,10 @@ router.post('/:_id', upload, authenticate, (req, res) => {
 		if(!report) {
       return res.status(404).json({
         error: true,
-        message: 'Report not found'
+        msg: 'Report not found'
       });
     }
+
     report.populate('future_books', function(err, r) {
       if(err) {
         console.error(err);
@@ -265,7 +226,7 @@ router.post('/:_id/upload_audios', upload, authenticate, (req, res) => {
     if(!report) {
       return res.status(404).json({
         error: true,
-        message: 'Report not found'
+        msg: 'Report not found'
       });
     }
     report.populate('future_books', function(err, r) {
@@ -281,18 +242,39 @@ router.post('/:_id/upload_audios', upload, authenticate, (req, res) => {
 
 /* Delete Report */
 router.delete('/:_id', (req, res) => {
-	var query = {_id: req.params._id};
-	
-	Report.remove(query, (err, reports) => {
-		if(err) {
-			console.error(err);
+  var query = {_id: req.params._id};
+  
+  // increase course hour for student tuition
+  Report.findOne(query, (err, report) => {
+    if(err) {
+      console.error(err)
     }
-    const response = {
-      success: true,
-      message: "Report successfully deleted"
-    };
-		res.json(response);
-	})
+    if(!report) {
+      return res.status(404).json({
+        success: false,
+        msg: 'Report not found'
+      });
+    }
+    report.increaseTuitionCourseHour()
+    report.removeFromPaycheck((error) => {
+      Report.remove(query, (err, reports) => {
+      	if(err) {
+      		return res.status(404).json({
+            success: false,
+            msg: 'Report not found'
+          });
+        }
+    
+        const response = {
+          success: true,
+          msg: "Report successfully deleted"
+        };
+        console.log("called")
+      	res.json(response);
+      })
+    })
+  })
+	
 });
 
 

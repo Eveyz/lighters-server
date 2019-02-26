@@ -57,7 +57,7 @@ router.put('/:_id', authenticate, (req, res) => {
 		if(!compensation) {
       return res.status(404).json({
         error: true,
-        message: 'Compensation not found'
+        msg: 'Compensation not found'
       });
     }
     res.json(compensation);

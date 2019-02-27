@@ -8,6 +8,7 @@ const router = express.Router();
 const Report = require('../models/report');
 const Paycheck = require('../models/paycheck');
 const Tuition = require('../models/tuition');
+const Teacher = require('../models/teacher');
 const mongoose = require('mongoose');
 const multer  = require('multer');
 const authenticate = require('../middlewares/authenticate');
@@ -71,12 +72,10 @@ router.get('/copy_report', authenticate, (req, res) => {
           msg: 'Report not found'
         });
       }
-  
-      // add report to paycheck
-      report.addToPaycheck()
-
       // decrease course hour for student tuition
       report.decreaseTuitionCourseHour()
+      // add report to paycheck
+      report.addToPaycheck()
 
       res.json(report);
     });
@@ -127,20 +126,14 @@ router.post('/', upload, authenticate, (req, res) => {
       });
     }
 
-    // add report to paycheck
-    report.addToPaycheck()
-
     // decrease course hour for student tuition
     report.decreaseTuitionCourseHour()
 
-    // res
-    report.populate('future_books', function(err, r) {
-      if(err) {
-        console.error(err);
-      }
+    // add report to paycheck
+    report.addToPaycheck()
 
-      res.json(r);
-    }).populate('future_books');
+    // res
+    res.json(report);
 
 	});
 });
@@ -190,12 +183,13 @@ router.post('/:_id', upload, authenticate, (req, res) => {
       });
     }
 
-    report.populate('future_books', function(err, r) {
-      if(err) {
-        console.error(err);
-      }
-      res.json(r);
-    });
+    // save to trigger calculate amount and updated time
+    report.save().then(() => {
+      // report updated, need to recalculate paycheck amount
+      report.recalculatePaycheck()
+    })
+
+    res.json(report);
 	});
 });
 
@@ -256,6 +250,7 @@ router.delete('/:_id', (req, res) => {
       });
     }
     report.increaseTuitionCourseHour()
+
     report.removeFromPaycheck((error) => {
       Report.remove(query, (err, reports) => {
       	if(err) {

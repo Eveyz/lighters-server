@@ -18,7 +18,7 @@ router.get('/', authenticate, (req, res) => {
 	}).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date',
+    select: 'course_date credit teacher_rate amount',
     populate: {
       path: 'course_id',
       model: 'Course',
@@ -27,7 +27,7 @@ router.get('/', authenticate, (req, res) => {
   }).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date',
+    select: 'course_date credit teacher_rate amount',
     populate: {
       path: 'student_id',
       model: 'Student',
@@ -46,7 +46,7 @@ router.get('/:_id', (req, res) => {
   }).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date',
+    select: 'course_date credit teacher_rate amount',
     populate: {
       path: 'course_id',
       model: 'Course',
@@ -55,7 +55,7 @@ router.get('/:_id', (req, res) => {
   }).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date',
+    select: 'course_date credit teacher_rate amount',
     populate: {
       path: 'student_id',
       model: 'Student',
@@ -70,12 +70,14 @@ router.post('/', authenticate, (req, res) => {
 	Paycheck.create(body, function(err, paycheck) {
 		if(err) {
 			console.error(err);
-		}
-		res.json(paycheck);
+    }
+
+    res.json(paycheck);
+    
 	}).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date',
+    select: 'course_date credit teacher_rate amount',
     populate: {
       path: 'course_id',
       model: 'Course',
@@ -84,7 +86,7 @@ router.post('/', authenticate, (req, res) => {
   }).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date',
+    select: 'course_date credit teacher_rate amount',
     populate: {
       path: 'student_id',
       model: 'Student',
@@ -114,11 +116,12 @@ router.put('/:_id', authenticate, (req, res) => {
         msg: 'Paycheck not found'
       });
     }
+
     res.json(paycheck);
 	}).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date',
+    select: 'course_date credit teacher_rate amount',
     populate: {
       path: 'course_id',
       model: 'Course',
@@ -127,7 +130,7 @@ router.put('/:_id', authenticate, (req, res) => {
   }).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date',
+    select: 'course_date credit teacher_rate amount',
     populate: {
       path: 'student_id',
       model: 'Student',
@@ -147,6 +150,5 @@ router.delete('/:_id', (req, res) => {
 		res.json(paychecks);
 	})
 });
-
 
 module.exports = router;

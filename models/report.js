@@ -6,8 +6,14 @@
 */
 
 var mongoose = require('mongoose');
-var Tuition = require('../models/tuition');
-var Paycheck = require('../models/paycheck');
+var Tuition = require('./tuition');
+var Paycheck = require('./paycheck');
+var Teacher = require('./teacher');
+var Course = require('./course');
+var Student = require('./student');
+var TeacherRate = require('./teacher_rate');
+var LevelSalary = require('./level_salary');
+const utils = require('../utils');
 
 var reportSchema = new mongoose.Schema({
   teacher_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'},
@@ -32,20 +38,30 @@ var reportSchema = new mongoose.Schema({
   audios: [],
   audios_files: [],
   paid: { type: Boolean, default: false },
-  credit: { type: Boolean, default: 1 },
+  credit: { type: Number, default: 1 },
+  teacher_rate: { type: Number, default: 0 },
   status: { type: String, default: "active" },
+  amount: { type: Number, default: 0 },
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   created_at: Date,
   updated_at: Date
 });
 
-reportSchema.pre("save", function(next){
+reportSchema.pre("save", async function(next){
   var currentDate = new Date();
   this.updated_at = currentDate;
   if ( !this.created_at ) {
     this.created_at = currentDate;
   }
+  await this.calculate()
+
   next();
+});
+
+reportSchema.post('init', function() {
+  if(this.amount === 0) {
+    this.calculate()
+  }
 });
 
 reportSchema.methods.decreaseTuitionCourseHour = function() {
@@ -65,6 +81,9 @@ reportSchema.methods.decreaseTuitionCourseHour = function() {
           msg: 'Tuition not found'
         });
       }
+      if(!tuition) {
+        return
+      }
       tuition.remain = tuition.course_hour - reportNumber
       tuition.save()
     })
@@ -79,6 +98,9 @@ reportSchema.methods.increaseTuitionCourseHour = function() {
         success: false,
         msg: 'Tuition not found'
       });
+    }
+    if(!tuition) {
+      return
     }
     tuition.remain = tuition.remain + 1
     tuition.save()
@@ -101,12 +123,14 @@ reportSchema.methods.addToPaycheck = function() {
         course_id: this.course_id,
         month: _month,
         reports: [this],
-        memo: "老师工资"
+        memo: "老师工资",
+        amount: this.amount
       }
       Paycheck.create(_paycheck, (err, paycheck) => {
         if(err) console.error(err);
       })
     } else {
+      pc.amount += this.amount
       pc.reports.push(this)
       pc.save()
     }
@@ -136,5 +160,55 @@ reportSchema.methods.removeFromPaycheck = function(callback) {
   callback()
 };
 
+reportSchema.methods.calculate = async function() {
+  // get report credit according to report situation
+  const reportCredit = utils.getReportCredit(this.situation)
+  console.log("credit: ", reportCredit)
+  this.credit = reportCredit  // update report credit
+  // check if teacher have specified rates
+  let reportPrice = 0
+  const teacher = await Teacher.findOne({_id: this.teacher_id})
+  const course = await Course.findOne({_id: this.course_id})
+  const _teacher_rates = await TeacherRate.find({teacher_id: this.teacher_id})
+  if(_teacher_rates.length > 0) {
+    _teacher_rates.forEach(tr => {
+      // match the specified rates
+      if(tr.course_type === course.type && tr.course_level === course.level) {
+        reportPrice = tr.rate
+        return
+      }
+    })
+  }
+  // not specified rates found, refer to the standard rates
+  if(reportPrice === 0) {
+    const _ls = await LevelSalary.findOne({course_level: course.level, type: course.type, level: `${teacher.level}级`})
+    reportPrice = _ls ? _ls.rate : 0 // if standard rate not setup, then set to 0
+    this.teacher_rate = reportPrice // => update report teacher rate
+    console.log("reportPrice: ", reportPrice)
+  }
+
+  // return final amount
+  this.amount = (reportPrice * reportCredit).toFixed(2)
+  // this.save()
+};
+
+reportSchema.methods.recalculatePaycheck = async function() {
+  const _month = this.course_date.substring(0, 7)
+  const paycheck_query = {
+    teacher_id: this.teacher_id,
+    month: _month,
+    paid: false
+  }
+  let _amount = 0
+  let pc = await Paycheck.findOne(paycheck_query)
+  let reports = await Report.find({_id: {$in: pc.reports}})
+  reports.forEach(report => {
+    _amount += report.amount 
+  })
+  pc.amount = _amount
+  pc.save()
+}
+
 var Report = mongoose.model('Report', reportSchema);
+
 module.exports = Report;

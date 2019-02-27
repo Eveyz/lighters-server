@@ -3,6 +3,7 @@ const config = require('./config');
 const User = require('./models/user');
 const Teacher = require('./models/teacher');
 const Student = require('./models/student');
+const LevelSalary = require('./models/level_salary');
 
 // Format of token
 // Authorization: Bearer <access_token>
@@ -61,7 +62,6 @@ function verifyAdmin(req, res, next) {
 function getStudyID(number) {
   let res;
   let sum = parseInt(number) + 10;
-  console.log("sum: ", sum);
   switch(true) {
     case (sum < 100):
       res = "0" + sum;
@@ -76,8 +76,40 @@ function getStudyID(number) {
   return res;
 }
 
+function getReportCredit(situation) {
+  let res;
+  switch(situation) {
+    case ("正常上课"):
+    case ("学员上课时间后才请假或无故缺课(1个课时费)"):
+    case ("学员迟到(不必补全课时, 可按时下课, 1个课时费)"):
+    case ("老师迟到早退10分钟以内(需免费于当堂或下堂课补全课时才可得1个课时费, 但会影响薪资晋级)"):
+      res = 1;
+      break;
+    case ("学员开课前2小时内才请假(0.5个课时费)"):
+    case ("老师无故迟到10分钟以上20分钟以内并且课程依旧进行(0.5个课时费)"):
+      res = 0.5;
+      break;
+    case ("老师无故迟到并且取消课程(0个课时费, 需免费补课一节)"):
+    case ("免费补课(0个课时费)"):
+      res = 0;
+      break;
+    default:
+      res = 0;
+      break;
+  }
+  return res;
+}
+
+async function getReportStandardRate(course_level, course_type, teacher_level) {
+  const query = {course_level: course_level, type: course_type, level: teacher_level}
+  const ls = await LevelSalary.findOne(query)
+  return ls.rate
+}
+
 module.exports = {
   verifyToken: verifyToken,
   verifyAdmin: verifyAdmin,
   getStudyID: getStudyID,
+  getReportCredit: getReportCredit,
+  getReportStandardRate: getReportStandardRate,
 }

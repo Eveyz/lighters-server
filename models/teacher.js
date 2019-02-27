@@ -5,6 +5,7 @@
 // status => adminCreated -> unverified -> verified -> pending <=> active
 
 var mongoose = require('mongoose');
+var TeacherRate = require('./teacher_rate');
 
 var teacherSchema = new mongoose.Schema({
   title: String,
@@ -54,6 +55,17 @@ teacherSchema.pre("save", function(next){
   }
   next();
 });
+
+teacherSchema.methods.teacher_rates = function() {
+  let query = {teacher_id: this._id}
+  TeacherRate.find(query, (err, teacher_rates) => {
+    if(err) console.error(err);
+    if(!teacher_rates) {
+      return []
+    }
+    return teacher_rates;
+  });
+};
 
 var Teacher = mongoose.model('Teacher', teacherSchema);
 

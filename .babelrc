@@ -1,11 +1,9 @@
 {
   "presets": ["es2015"],
   "plugins": [
-    [
-      "@babel/transform-runtime", {
-        "polyfill": false,
-        "regenerator": false
-      }
-    ]
+    ["transform-runtime", {
+      "polyfill": false,
+      "regenerator": true
+    }]
   ]
 }

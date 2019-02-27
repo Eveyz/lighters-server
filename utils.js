@@ -100,16 +100,9 @@ function getReportCredit(situation) {
   return res;
 }
 
-async function getReportStandardRate(course_level, course_type, teacher_level) {
-  const query = {course_level: course_level, type: course_type, level: teacher_level}
-  const ls = await LevelSalary.findOne(query)
-  return ls.rate
-}
-
 module.exports = {
   verifyToken: verifyToken,
   verifyAdmin: verifyAdmin,
   getStudyID: getStudyID,
   getReportCredit: getReportCredit,
-  getReportStandardRate: getReportStandardRate,
 }

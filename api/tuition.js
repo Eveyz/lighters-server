@@ -18,7 +18,7 @@ router.get('/', authenticate, (req, res) => {
 			console.error(err);
 		}
 		res.json(tuitions);
-	}).populate('student_id', 'englishname firstname lastname').populate('course_id', 'name');;
+	}).populate('student_id', 'englishname firstname lastname').populate('course_id', 'name');
 });
 
 /* Get tuition by id */
@@ -28,7 +28,7 @@ router.get('/:_id', (req, res) => {
   Tuition.findOne(query, (err, tuition) => {
     if(err) console.error(err);
     res.json(tuition);
-  }).populate('student_id', 'englishname firstname lastname').populate('course_id', 'name');;
+  }).populate('student_id', 'englishname firstname lastname').populate('course_id', 'name');
 });
 
 /* Create Tuition */
@@ -130,7 +130,7 @@ router.put('/:_id', authenticate, (req, res) => {
       })
     })
     res.json(tuition);
-	}).populate('student_id', 'englishname firstname lastname').populate('course_id', 'name');;
+	}).populate('student_id', 'englishname firstname lastname').populate('course_id', 'name');
 });
 
 /* Delete Tuition */

@@ -21,6 +21,7 @@ const paychecksAPI = require("./api/paycheck");
 const compensationsAPI = require("./api/compensation");
 const transactionsAPI = require("./api/transaction");
 const tuitionsAPI = require("./api/tuition");
+const teacherRatesAPI = require("./api/teacher_rates");
 
 const server = express();
 
@@ -48,6 +49,7 @@ server.use('/paychecks', paychecksAPI);
 server.use('/compensations', compensationsAPI);
 server.use('/transactions', transactionsAPI);
 server.use('/tuitions', tuitionsAPI);
+server.use('/teacher_rates', teacherRatesAPI);
 
 /* MongoDB connection 
  * @author: znz

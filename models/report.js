@@ -181,8 +181,10 @@ reportSchema.methods.calculate = async function() {
   }
   // not specified rates found, refer to the standard rates
   if(reportPrice === 0) {
-    const _ls = await LevelSalary.findOne({course_level: course.level, type: course.type, level: `${teacher.level}级`})
-    reportPrice = _ls ? _ls.rate : 0 // if standard rate not setup, then set to 0
+    if(teacher && course) {
+      const _ls = await LevelSalary.findOne({course_level: course.level, type: course.type, level: `${teacher.level}级`})
+      reportPrice = _ls ? _ls.rate : 0 // if standard rate not setup, then set to 0
+    }
     this.teacher_rate = reportPrice // => update report teacher rate
     console.log("reportPrice: ", reportPrice)
   }

@@ -53,16 +53,21 @@ reportSchema.pre("save", async function(next){
   if ( !this.created_at ) {
     this.created_at = currentDate;
   }
-  await this.calculate()
+  if(this.teacher_rate === 0) {
+    await this.calculate()
+  }
 
   next();
 });
 
-reportSchema.post('init', function() {
-  if(this.amount === 0) {
-    this.calculate()
-  }
-});
+// reportSchema.post("init", function(doc){
+//   if(doc.teacher_rate === 0) {
+//     console.log("doc id: ", doc._id)
+//     this.db.model('Report').findOne({_id: doc._id}, (err, report) => {
+//       report.save()
+//     })
+//   }
+// });
 
 reportSchema.methods.decreaseTuitionCourseHour = function() {
   let _query = {course_id: this.course_id, student_id: this.student_id}
@@ -191,7 +196,6 @@ reportSchema.methods.calculate = async function() {
 
   // return final amount
   this.amount = (reportPrice * reportCredit).toFixed(2)
-  // this.save()
 };
 
 reportSchema.methods.recalculatePaycheck = async function() {

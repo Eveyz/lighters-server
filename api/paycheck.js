@@ -13,12 +13,12 @@ router.get('/', authenticate, (req, res) => {
 	Paycheck.find(req.query, (err, paychecks) => {
 		if(err) {
 			console.error(err);
-		}
+    }
 		res.json(paychecks);
 	}).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date credit teacher_rate amount',
+    select: 'course_date credit teacher_rate amount situation teacher_id',
     populate: {
       path: 'course_id',
       model: 'Course',
@@ -27,7 +27,7 @@ router.get('/', authenticate, (req, res) => {
   }).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date credit teacher_rate amount',
+    select: 'course_date credit teacher_rate amount situation teacher_id',
     populate: {
       path: 'student_id',
       model: 'Student',
@@ -46,7 +46,7 @@ router.get('/:_id', (req, res) => {
   }).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date credit teacher_rate amount',
+    select: 'course_date credit teacher_rate amount situation teacher_id',
     populate: {
       path: 'course_id',
       model: 'Course',
@@ -55,7 +55,7 @@ router.get('/:_id', (req, res) => {
   }).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date credit teacher_rate amount',
+    select: 'course_date credit teacher_rate amount situation teacher_id',
     populate: {
       path: 'student_id',
       model: 'Student',
@@ -77,7 +77,7 @@ router.post('/', authenticate, (req, res) => {
 	}).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date credit teacher_rate amount',
+    select: 'course_date credit teacher_rate amount situation teacher_id',
     populate: {
       path: 'course_id',
       model: 'Course',
@@ -86,7 +86,7 @@ router.post('/', authenticate, (req, res) => {
   }).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date credit teacher_rate amount',
+    select: 'course_date credit teacher_rate amount situation teacher_id',
     populate: {
       path: 'student_id',
       model: 'Student',
@@ -121,7 +121,7 @@ router.put('/:_id', authenticate, (req, res) => {
 	}).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date credit teacher_rate amount',
+    select: 'course_date credit teacher_rate amount situation teacher_id',
     populate: {
       path: 'course_id',
       model: 'Course',
@@ -130,7 +130,7 @@ router.put('/:_id', authenticate, (req, res) => {
   }).populate({
     path: 'reports',
     model: 'Report',
-    select: 'course_date credit teacher_rate amount',
+    select: 'course_date credit teacher_rate amount situation teacher_id',
     populate: {
       path: 'student_id',
       model: 'Student',

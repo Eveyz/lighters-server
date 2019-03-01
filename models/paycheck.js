@@ -1,10 +1,12 @@
 /* 
  * @author: znz
+ * 
+ * paycheck amount will be calculated when report created, copied, or updated(using the recal function in report model), viewed in the paycheck api
 */
 
-var mongoose = require('mongoose');
 const Report = require('./report');
 const Teacher = require('./teacher');
+var mongoose = require('mongoose');
 
 var paycheckSchema = new mongoose.Schema({
   teacher_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'},
@@ -32,20 +34,24 @@ paycheckSchema.pre("save", function(next){
   next();
 });
 
-paycheckSchema.post('find', function() {
-  if(this.amount === 0) {
-    this.calculate()
-  }
-});
+// paycheckSchema.post('find', function(docs) {
+//   console.log(docs)
+//   docs.forEach(doc => {
+//     if(doc.amount === 0) {
+//       // doc.calculate()
+//     }
+//   })
+// });
 
 paycheckSchema.methods.calculate = async function() {
   let query = {_id: this._id}
   let _amount = 0
-  let reports = await Report.find({_id: {$in: this.reports}})
+  let reports  = await Report.find({_id: {$in: this.reports}})
   reports.forEach(report => {
     _amount += report.amount 
   })
   this.amount = _amount
+  this.save()
 };
 
 var Paycheck = mongoose.model('Paycheck', paycheckSchema);

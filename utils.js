@@ -100,9 +100,16 @@ function getReportCredit(situation) {
   return res;
 }
 
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
+
 module.exports = {
   verifyToken: verifyToken,
   verifyAdmin: verifyAdmin,
   getStudyID: getStudyID,
   getReportCredit: getReportCredit,
+  asyncForEach: asyncForEach
 }

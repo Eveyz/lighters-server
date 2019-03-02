@@ -4,6 +4,7 @@
 
 const express = require('express');
 const path = require('path');
+const _ = require('lodash');
 const router = express.Router();
 const Tuition = require('../models/tuition');
 const Transaction = require('../models/transaction');
@@ -135,14 +136,33 @@ router.put('/:_id', authenticate, (req, res) => {
 
 /* Delete Tuition */
 router.delete('/:_id', (req, res) => {
-	var query = {_id: req.params._id};
-	
-	Tuition.remove(query, (err, tuitions) => {
-		if(err) {
-			console.error(err);
-		}
-		res.json(tuitions);
-	})
+  var query = {_id: req.params._id};
+
+  Tuition.findOne(query, (err, tuition) => {
+    if(err) console.error(err);
+
+    if(!tuition) {
+      res.status(400).json({
+        success: false,
+        msg: 'Tuition not found!'
+      });
+    }
+
+    Transaction.findOneAndDelete({_id: tuition.transaction_id}, (err) => {
+      if(err) console.error(err);
+
+      tuition.remove(err => {
+        if(err) console.error(err);
+
+        res.status(200).json({
+          success: true,
+          msg: 'Tuition deleted!'
+        });
+      })
+    });
+
+  });
+
 });
 
 

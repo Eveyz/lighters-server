@@ -11,6 +11,7 @@ const Book = require('../models/book');
 const Course = require('../models/course');
 const Teacher = require('../models/teacher');
 const Student = require('../models/student');
+const Paycheck = require('../models/paycheck');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const utils = require('../utils');
@@ -48,7 +49,7 @@ router.post('/authenticate', (req, res) => {
         }
       });
 
-      const _expiredIn = req.body.remember_me ? '2d' : '2h';
+      const _expiredIn = req.body.remember_me ? '5h' : '2h';
       jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: _expiredIn}, (err, token) => {
         if(err) console.error(err);
         if(user.identity === "teacher") {
@@ -219,39 +220,46 @@ router.get('/from/token', utils.verifyToken, (req, res) => {
 });
 
 router.get('/admin/init', utils.verifyAdmin, (req, res) => {
-  var _books = [], _courses = [], _students = [], _teachers = [];
-  var finished = _.after(4, function() {
+  var _books = 0, _courses = 0, _students = 0, _teachers = 0, _paychecks = 0;
+  var finished = _.after(5, function() {
     res.json({
       books: _books,
       courses: _courses,
       students: _students,
-      teachers: _teachers
+      teachers: _teachers,
+      paychecks: _paychecks
     });
   });
   Book.find({}, (err, books) => {
     if(err)
       console.error(err);
-    _books = books;
+    _books = books.length;
     finished();
   }).populate('keywords');
   Course.find({}, (err, courses) => {
     if(err)
       console.error(err);
-    _courses = courses;
+    _courses = courses.length;
     finished();
   }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
   Teacher.find({}, (err, teachers) => {
     if(err)
       console.error(err);
-    _teachers = teachers;
+    _teachers = teachers.length;
     finished();
   }).populate('courses').populate('students');
   Student.find({}, (err, students) => {
     if(err)
       console.error(err);
-    _students = students;
+    _students = students.length;
     finished();
   }).populate('courses').populate('teachers');
+  Paycheck.find({"paid": false}, (err, paychecks) => {
+    if(err)
+      console.error(err);
+    _paychecks = paychecks.length;
+    finished();
+  });
 });
 
 // // routes that need to be authenticated

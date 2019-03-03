@@ -13,7 +13,7 @@ const authenticate = require('../middlewares/authenticate');
 /* Get Students */
 router.get('/', authenticate, (req, res) => {
 
-	Student.find((err, students) => {
+	Student.find(req.query, (err, students) => {
 		if(err) {
 			console.error(err);
 		}

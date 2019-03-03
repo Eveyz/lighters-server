@@ -19,7 +19,7 @@ router.get('/', authenticate, (req, res) => {
 			console.error(err);
 		}
 		res.json(tuitions);
-	}).populate('student_id', 'englishname firstname lastname').populate('course_id', 'name');
+	}).populate('student_id', 'englishname firstname lastname');
 });
 
 /* Get tuition by id */
@@ -29,7 +29,7 @@ router.get('/:_id', (req, res) => {
   Tuition.findOne(query, (err, tuition) => {
     if(err) console.error(err);
     res.json(tuition);
-  }).populate('student_id', 'englishname firstname lastname').populate('course_id', 'name');
+  }).populate('student_id', 'englishname firstname lastname');
 });
 
 /* Create Tuition */
@@ -45,33 +45,29 @@ router.post('/', authenticate, (req, res) => {
       if(err) {
         console.error(err);
       }
-      Course.findOne({_id: tuition.course_id}, (err, course) => {
+      const _transaction = {
+        status: "IN",
+        src: `${student.englishname}`,
+        dest: "Lighters",
+        amount: tuition.amount,
+        memo: `${student.englishname}课时费`
+      }
+  
+      Transaction.create(_transaction, (err, transaction) => {
         if(err) {
           console.error(err);
         }
-
-        const _transaction = {
-          status: "IN",
-          src: `${student.englishname}`,
-          dest: "Lighters",
-          amount: tuition.amount,
-          memo: `${course.name}课时费`
-        }
-    
-        Transaction.create(_transaction, (err, transaction) => {
-          if(err) {
-            console.error(err);
-          }
-          tuition.transaction_id = transaction.id
-          tuition.save()
-        });
-      })
+        tuition.transaction_id = transaction.id
+        tuition.save().then(doc => {
+          student.tuition_amount += tuition.amount
+          student.save()
+        })
+      });
     })
 
     Tuition.
     findOne({_id: tuition._id}).
     populate({ path: 'student_id', select: 'englishname firstname lastname'}).
-    populate({ path: 'course_id', select: 'name'}).
     then(function(doc) {
       res.json(doc);
     })
@@ -103,35 +99,38 @@ router.put('/:_id', authenticate, (req, res) => {
       if(err) {
         console.error(err);
       }
-      Course.findOne({_id: tuition.course_id}, (err, course) => {
+      if(!student) {
+        return res.status(404).json({
+          error: true,
+          msg: 'Student not found'
+        });
+      }
+
+      const _transaction = {
+        status: "IN",
+        src: `${student.englishname}`,
+        dest: "Lighters",
+        amount: tuition.amount,
+        memo: `${student.englishname}课时费`
+      }
+
+      let _query = {_id: tuition.transaction_id};
+      let _update = {
+        '$set': _transaction
+      };
+
+      var _options = { new: true }; // newly updated record
+  
+      Transaction.findOneAndUpdate(_query, _update, _options, (err, transaction) => {
         if(err) {
           console.error(err);
         }
-
-        const _transaction = {
-          status: "IN",
-          src: `${student.englishname}`,
-          dest: "Lighters",
-          amount: tuition.amount,
-          memo: `${course.name}课时费`
-        }
-
-        let _query = {_id: tuition.transaction_id};
-        let _update = {
-          '$set': _transaction
-        };
-
-        var _options = { new: true }; // newly updated record
-    
-        Transaction.findOneAndUpdate(_query, _update, _options, (err, transaction) => {
-          if(err) {
-            console.error(err);
-          }
-        });
-      })
+        student.tuition_amount += tuition.amount
+        student.save()
+      });
     })
     res.json(tuition);
-	}).populate('student_id', 'englishname firstname lastname').populate('course_id', 'name');
+	}).populate('student_id', 'englishname firstname lastname');
 });
 
 /* Delete Tuition */
@@ -148,9 +147,7 @@ router.delete('/:_id', (req, res) => {
       });
     }
 
-    Transaction.findOneAndDelete({_id: tuition.transaction_id}, (err) => {
-      if(err) console.error(err);
-
+    var finished = _.after(2, function() {
       tuition.remove(err => {
         if(err) console.error(err);
 
@@ -159,6 +156,25 @@ router.delete('/:_id', (req, res) => {
           msg: 'Tuition deleted!'
         });
       })
+    });
+
+    Student.findOne({_id: tuition.student_id}, (err, student) => {
+      if(err) console.error(err);
+      if(!student) {
+        res.status(400).json({
+          success: false,
+          msg: 'Student not found!'
+        });
+      }
+      student.tuition_amount -= tuition.amount
+      student.save().then(doc => {
+        finished()
+      })
+    })
+
+    Transaction.findOneAndDelete({_id: tuition.transaction_id}, (err) => {
+      if(err) console.error(err);
+      finished()
     });
 
   });

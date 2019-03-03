@@ -73,7 +73,7 @@ router.get('/copy_report', authenticate, (req, res) => {
         });
       }
       // decrease course hour for student tuition
-      report.decreaseTuitionCourseHour()
+      // report.decreaseTuitionCourseHour()
       // add report to paycheck
       report.addToPaycheck()
 
@@ -127,7 +127,7 @@ router.post('/', upload, authenticate, (req, res) => {
     }
 
     // decrease course hour for student tuition
-    report.decreaseTuitionCourseHour()
+    // report.decreaseTuitionCourseHour()
 
     // add report to paycheck
     report.addToPaycheck()
@@ -249,7 +249,8 @@ router.delete('/:_id', (req, res) => {
         msg: 'Report not found'
       });
     }
-    report.increaseTuitionCourseHour()
+    
+    // report.increaseTuitionCourseHour()
 
     report.removeFromPaycheck((error) => {
       Report.remove(query, (err, reports) => {

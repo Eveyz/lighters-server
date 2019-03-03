@@ -41,6 +41,24 @@ router.post('/', authenticate, (req, res) => {
 			console.error(err);
     }
 
+    var finished = _.after(2, function() {
+      Tuition.
+      findOne({_id: tuition._id}).
+      populate({ path: 'student_id', select: 'englishname firstname lastname'}).
+      then(function(doc) {
+        Student.find( {tuition_amount: {$lte: 300}}, (err, students) => {
+          if(err) {
+            console.error(err);
+          }
+          console.log("created: ", students)
+          res.json({
+            tuition: doc,
+            students: students
+          });
+        })
+      })
+    });
+
     Student.findOne({_id: tuition.student_id}, (err, student) => {
       if(err) {
         console.error(err);
@@ -58,19 +76,16 @@ router.post('/', authenticate, (req, res) => {
           console.error(err);
         }
         tuition.transaction_id = transaction.id
-        tuition.save().then(doc => {
+        tuition.save(doc => {
           student.tuition_amount += tuition.amount
-          student.save()
+          student.save(_s => {
+            finished()
+          })
         })
       });
+      finished()
     })
 
-    Tuition.
-    findOne({_id: tuition._id}).
-    populate({ path: 'student_id', select: 'englishname firstname lastname'}).
-    then(function(doc) {
-      res.json(doc);
-    })
 	});
 });
 
@@ -83,8 +98,8 @@ router.put('/:_id', authenticate, (req, res) => {
 		'$set': _tuition
 	};
 
-  var options = { new: true }; // newly updated record
-
+  var options = { new: true };
+  // update tuition
 	Tuition.findOneAndUpdate(query, update, options, (err, tuition) =>{
 		if(err) {
 			console.error(err);
@@ -95,6 +110,7 @@ router.put('/:_id', authenticate, (req, res) => {
         msg: 'Tuition not found'
       });
     }
+    // find student to update coresponding transaction
     Student.findOne({_id: tuition.student_id}, (err, student) => {
       if(err) {
         console.error(err);
@@ -119,17 +135,40 @@ router.put('/:_id', authenticate, (req, res) => {
         '$set': _transaction
       };
 
-      var _options = { new: true }; // newly updated record
-  
+      var _options = { new: true };
+
+      // update transaction amount according to new tuition amount
       Transaction.findOneAndUpdate(_query, _update, _options, (err, transaction) => {
         if(err) {
           console.error(err);
         }
-        student.tuition_amount += tuition.amount
-        student.save()
+        // wait for add up all tuition amount for student, and then save
+        var finished = _.after(1, function() {
+          Student.find( {tuition_amount: {$lte: 300}}, (err, students) => {
+            if(err) {
+              console.error(err);
+            }
+            res.json({
+              tuition: tuition,
+              students: students
+            });
+          })
+        });
+        // added up all tuitions amount for student
+        var _tuition_amount = 0
+        Tuition.find({student_id: student._id}, (err, tuitions) => {
+          tuitions.forEach(t => {
+            _tuition_amount += t.amount
+          })
+          student.tuition_amount = _tuition_amount
+          student.save().then(doc => {
+            finished()
+          })
+        })
+
       });
     })
-    res.json(tuition);
+    // res.json(tuition);
 	}).populate('student_id', 'englishname firstname lastname');
 });
 
@@ -150,11 +189,12 @@ router.delete('/:_id', (req, res) => {
     var finished = _.after(2, function() {
       tuition.remove(err => {
         if(err) console.error(err);
-
-        res.status(200).json({
-          success: true,
-          msg: 'Tuition deleted!'
-        });
+        Student.find( {tuition_amount: {$lte: 300}}, (err, students) => {
+          if(err) {
+            console.error(err);
+          }
+          res.json(students);
+        })
       })
     });
 

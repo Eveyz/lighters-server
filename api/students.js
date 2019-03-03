@@ -21,6 +21,24 @@ router.get('/', authenticate, (req, res) => {
 	})
 });
 
+router.get('/low_balance', authenticate, (req, res) => {
+	Student.find({}, (err, students) => {
+		if(err) {
+			console.error(err);
+		}
+		var lowBalanceStudents = [];
+		students.forEach(student => {
+			if(student.tuition_amount <= 300) {
+				lowBalanceStudents.push(student)
+			}
+		})
+		res.json({
+			students: students,
+			lowBalanceStudents: lowBalanceStudents
+		});
+	})
+});
+
 /* Get Student by id */
 router.get('/:_id', (req, res) => {
 	let query = {_id: req.params._id};

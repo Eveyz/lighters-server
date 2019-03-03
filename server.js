@@ -60,16 +60,9 @@ if (process.env.NODE_ENV === "production") {
   console.log('Production mode');
   server.use(express.static(path.join(__dirname, '/build')));
 
-  // server.get('*', (req, res) => {
-  //   res.sendFile(path.join(__dirname, '/build/index.html'));
-  // });
-  server.get('/*', function(req, res) {   
-    res.sendFile(path.join(__dirname, '/build/index.html'), function(err) {
-      if (err) {
-        res.status(500).send(err)
-      }
-    })
-  })
+  server.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/build/index.html'));
+  });
 }
 
 const PORT = process.env.PORT || config.port;

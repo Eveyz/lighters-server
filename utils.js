@@ -91,6 +91,7 @@ function getReportCredit(situation) {
       break;
     case ("老师无故迟到并且取消课程(0个课时费, 需免费补课一节)"):
     case ("免费补课(0个课时费)"):
+    case ("试课"):
       res = 0;
       break;
     default:

@@ -14,10 +14,17 @@ const utils = require('../utils');
 const mongoose = require('mongoose');
 const authenticate = require('../middlewares/authenticate');
 
-/* Get Books */
+/* Get Courses */
 router.get('/', utils.verifyAdmin, (req, res) => {
   // console.log(req.currentUser);
-	Course.find((err, courses) => {
+  var _query = req.query
+  if(req.query.status) {
+    _query = {
+      "teachers": {"$in": [req.query.teacher_id]},
+      "status": req.query.status
+    }
+  }
+	Course.find(_query, (err, courses) => {
 		if(err) {
 			console.error(err);
 		}

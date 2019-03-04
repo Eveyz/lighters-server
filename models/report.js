@@ -72,14 +72,16 @@ reportSchema.pre("save", async function(next){
 reportSchema.methods.decreaseStudentBalance = async function() {
   let course = await Course.findOne({_id: this.course_id})
   let student = await Student.findOne({_id: this.student_id})
-  student.tuition_amount -= course.course_rate
+  const _coruse_rate = utils.getReportCredit(this.situation) * course.course_rate
+  student.tuition_amount -= _coruse_rate
   await student.save()
 };
 
 reportSchema.methods.increaseStudentBalance = async function() {
   let course = await Course.findOne({_id: this.course_id})
   let student = await Student.findOne({_id: this.student_id})
-  student.tuition_comment += course.course_rate
+  const _coruse_rate = utils.getReportCredit(this.situation) * course.course_rate
+  student.tuition_comment += _coruse_rate
   await student.save()
 };
 

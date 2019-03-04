@@ -89,12 +89,12 @@ router.post('/createStudent', utils.verifyAdmin, (req, res) => {
 });
 
 /* Update Teacher */
-router.put('/:_id', authenticate, (req, res) => {
-  let _teacher = req.body;
+router.put('/updateTeacher', authenticate, (req, res) => {
+  let data = req.body;
 
-  let query = {_id: req.params._id};
+  let query = {_id: data._id};
 	let update = {
-		'$set': _teacher
+		'$set': data.teacher
 	};
 
   var options = { new: true }; // newly updated record
@@ -113,5 +113,29 @@ router.put('/:_id', authenticate, (req, res) => {
 	});
 });
 
+/* Update Student */
+router.put('/updateStudent', authenticate, (req, res) => {
+  let data = req.body;
+
+  let query = {_id: data._id};
+	let update = {
+		'$set': data.student
+	};
+
+  var options = { new: true }; // newly updated record
+
+	Student.findOneAndUpdate(query, update, options, (err, student) =>{
+		if(err) {
+			console.error(err);
+    }
+		if(!student) {
+      return res.status(404).json({
+        error: true,
+        msg: 'Student not found'
+      });
+    }
+    res.json(student);
+	});
+});
 
 module.exports = router;

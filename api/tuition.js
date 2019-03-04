@@ -33,64 +33,48 @@ router.get('/:_id', (req, res) => {
 });
 
 /* Create Tuition */
-router.post('/', authenticate, (req, res) => {
+router.post('/', authenticate, async (req, res) => {
   let body = req.body;
-  
-	Tuition.create(body, (err, tuition) => {
-		if(err) {
-			console.error(err);
-    }
 
-    var finished = _.after(2, function() {
-      Tuition.
-      findOne({_id: tuition._id}).
-      populate({ path: 'student_id', select: 'englishname firstname lastname'}).
-      then(function(doc) {
-        Student.find( {tuition_amount: {$lte: 300}}, (err, students) => {
-          if(err) {
-            console.error(err);
-          }
-          console.log("created: ", students)
-          res.json({
-            tuition: doc,
-            students: students
-          });
-        })
-      })
+  let tuition = await Tuition.create(body)
+  // console.log("1 tuition created ")
+
+  let student = await Student.findOne({_id: tuition.student_id})
+  // console.log("2 student found ")
+
+  const _transaction = {
+    status: "IN",
+    src: `${student.englishname}`,
+    dest: "Lighters",
+    amount: tuition.amount,
+    memo: `${student.englishname}课时费`
+  }
+  let transaction = await Transaction.create(_transaction)
+  // console.log("3 transaction created ")
+
+  tuition.transaction_id = transaction.id
+  let p1 = tuition.save()
+  student.tuition_amount += tuition.amount
+  let p2 = student.save()
+  await Promise.all([p1, p2])
+  // console.log("4 tuition student updated ")
+
+  Tuition.
+  findOne({_id: tuition._id}).
+  populate({ path: 'student_id', select: 'englishname firstname lastname'}).
+  then(async function(doc) {
+    let students = await Student.find( {tuition_amount: {$lte: 300}})
+    // console.log("5 students found ")
+    res.json({
+      tuition: doc,
+      students: students
     });
-
-    Student.findOne({_id: tuition.student_id}, (err, student) => {
-      if(err) {
-        console.error(err);
-      }
-      const _transaction = {
-        status: "IN",
-        src: `${student.englishname}`,
-        dest: "Lighters",
-        amount: tuition.amount,
-        memo: `${student.englishname}课时费`
-      }
+  })
   
-      Transaction.create(_transaction, (err, transaction) => {
-        if(err) {
-          console.error(err);
-        }
-        tuition.transaction_id = transaction.id
-        tuition.save(doc => {
-          student.tuition_amount += tuition.amount
-          student.save(_s => {
-            finished()
-          })
-        })
-      });
-      finished()
-    })
-
-	});
 });
 
 /* Update Tuition */
-router.put('/:_id', authenticate, (req, res) => {
+router.put('/:_id', authenticate, async (req, res) => {
   let _tuition = req.body;
 
   let query = {_id: req.params._id};
@@ -99,125 +83,78 @@ router.put('/:_id', authenticate, (req, res) => {
 	};
 
   var options = { new: true };
+
+  // query tuition first to get previous amount
+  const pre_tuition = await Tuition.findOne(query);
+  const pre_amount = pre_tuition.amount
+
   // update tuition
-	Tuition.findOneAndUpdate(query, update, options, (err, tuition) =>{
-		if(err) {
-			console.error(err);
-		}
-		if(!tuition) {
-      return res.status(404).json({
-        error: true,
-        msg: 'Tuition not found'
-      });
-    }
-    // find student to update coresponding transaction
-    Student.findOne({_id: tuition.student_id}, (err, student) => {
-      if(err) {
-        console.error(err);
-      }
-      if(!student) {
-        return res.status(404).json({
-          error: true,
-          msg: 'Student not found'
-        });
-      }
+  let tuition = await Tuition.findOneAndUpdate(query, update, options).populate('student_id', 'englishname firstname lastname');
+  // console.log("1 tuition updated")
+  if(!tuition) {
+    return res.status(404).json({
+      error: true,
+      msg: 'Tuition not found'
+    });
+  }
+  // find student for information
+  let student = await Student.findOne({_id: tuition.student_id})
+  // console.log("2 student found and updated")
+  
+  // update transaction amount according to new tuition amount
+  const _transaction = {
+    status: "IN",
+    src: `${student.englishname}`,
+    dest: "Lighters",
+    amount: tuition.amount,
+    memo: `${student.englishname}课时费`
+  }
+  let _query = {_id: tuition.transaction_id};
+  let _update = {
+    '$set': _transaction
+  };
+  var _options = { new: true };
+  await Transaction.findOneAndUpdate(_query, _update, _options)
+  // console.log("3 transaction found and updated ")
 
-      const _transaction = {
-        status: "IN",
-        src: `${student.englishname}`,
-        dest: "Lighters",
-        amount: tuition.amount,
-        memo: `${student.englishname}课时费`
-      }
+  // updated student tuition_amount
+  student.tuition_amount += (tuition.amount - pre_amount)
+  await student.save()
+  // console.log("5 student saved: ", student.tuition_amount)
 
-      let _query = {_id: tuition.transaction_id};
-      let _update = {
-        '$set': _transaction
-      };
-
-      var _options = { new: true };
-
-      // update transaction amount according to new tuition amount
-      Transaction.findOneAndUpdate(_query, _update, _options, (err, transaction) => {
-        if(err) {
-          console.error(err);
-        }
-        // wait for add up all tuition amount for student, and then save
-        var finished = _.after(1, function() {
-          Student.find( {tuition_amount: {$lte: 300}}, (err, students) => {
-            if(err) {
-              console.error(err);
-            }
-            res.json({
-              tuition: tuition,
-              students: students
-            });
-          })
-        });
-        // added up all tuitions amount for student
-        var _tuition_amount = 0
-        Tuition.find({student_id: student._id}, (err, tuitions) => {
-          tuitions.forEach(t => {
-            _tuition_amount += t.amount
-          })
-          student.tuition_amount = _tuition_amount
-          student.save().then(doc => {
-            finished()
-          })
-        })
-
-      });
-    })
-    // res.json(tuition);
-	}).populate('student_id', 'englishname firstname lastname');
+  // wait for add up all tuition amount for student, and then save
+  let students = await Student.find( {tuition_amount: {$lte: 300}})
+  // console.log("6 students found")
+  res.json({
+    tuition: tuition,
+    students: students
+  });
 });
 
 /* Delete Tuition */
-router.delete('/:_id', (req, res) => {
+router.delete('/:_id', async (req, res) => {
   var query = {_id: req.params._id};
 
-  Tuition.findOne(query, (err, tuition) => {
-    if(err) console.error(err);
-
-    if(!tuition) {
-      res.status(400).json({
-        success: false,
-        msg: 'Tuition not found!'
-      });
-    }
-
-    var finished = _.after(2, function() {
-      tuition.remove(err => {
-        if(err) console.error(err);
-        Student.find( {tuition_amount: {$lte: 300}}, (err, students) => {
-          if(err) {
-            console.error(err);
-          }
-          res.json(students);
-        })
-      })
+  let tuition = await Tuition.findOne(query)
+  if(!tuition) {
+    res.status(400).json({
+      success: false,
+      msg: 'Tuition not found!'
     });
+  }
 
-    Student.findOne({_id: tuition.student_id}, (err, student) => {
-      if(err) console.error(err);
-      if(!student) {
-        res.status(400).json({
-          success: false,
-          msg: 'Student not found!'
-        });
-      }
-      student.tuition_amount -= tuition.amount
-      student.save().then(doc => {
-        finished()
-      })
-    })
+  // reuduce student amount
+  let student = await Student.findOne({_id: tuition.student_id})
+  student.tuition_amount -= tuition.amount
+  await student.save()
 
-    Transaction.findOneAndDelete({_id: tuition.transaction_id}, (err) => {
-      if(err) console.error(err);
-      finished()
-    });
+  // delete transaction related to tuition
+  await Transaction.findOneAndDelete({_id: tuition.transaction_id})
 
-  });
+  // remove tuition
+  await tuition.remove()
+  let students = await Student.find( {tuition_amount: {$lte: 300}})
+  res.json(students)
 
 });
 

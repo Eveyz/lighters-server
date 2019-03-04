@@ -69,57 +69,28 @@ reportSchema.pre("save", async function(next){
 //   }
 // });
 
-reportSchema.methods.decreaseTuitionCourseHour = function() {
-  let _query = {course_id: this.course_id, student_id: this.student_id}
-  this.db.model('Report').find(_query, (err, reports) => {
-    if(err) {
-      return res.status(404).json({
-        success: false,
-        msg: 'Tuitions not found'
-      });
-    }
-    let reportNumber = reports.length
-    Tuition.findOne(_query, (err, tuition) => {
-      if(err) {
-        return res.status(404).json({
-          success: false,
-          msg: 'Tuition not found'
-        });
-      }
-      if(!tuition) {
-        return
-      }
-      tuition.remain = tuition.course_hour - reportNumber
-      tuition.save()
-    })
-  })
+reportSchema.methods.decreaseStudentBalance = async function() {
+  let course = await Course.findOne({_id: this.course_id})
+  let student = await Student.findOne({_id: this.student_id})
+  student.tuition_amount -= course.course_rate
+  await student.save()
 };
 
-reportSchema.methods.increaseTuitionCourseHour = function() {
-  let _query = {course_id: this.course_id, student_id: this.student_id}
-  Tuition.findOne(_query, (err, tuition) => {
-    if(err) {
-      return res.status(404).json({
-        success: false,
-        msg: 'Tuition not found'
-      });
-    }
-    if(!tuition) {
-      return
-    }
-    tuition.remain = tuition.remain + 1
-    tuition.save()
-  })
+reportSchema.methods.increaseStudentBalance = async function() {
+  let course = await Course.findOne({_id: this.course_id})
+  let student = await Student.findOne({_id: this.student_id})
+  student.tuition_comment += course.course_rate
+  await student.save()
 };
 
-reportSchema.methods.addToPaycheck = function() {
+reportSchema.methods.addToPaycheck = async function() {
   const _month = this.course_date.substring(0, 7)
   const paycheck_query = {
     teacher_id: this.teacher_id,
     month: _month,
     paid: false
   }
-  Paycheck.findOne(paycheck_query, (err, pc) => {
+  mongoose.model('Paycheck').findOne(paycheck_query, (err, pc) => {
     if(err) console.error(err);
     if(!pc) {
       const _paycheck = {
@@ -131,7 +102,7 @@ reportSchema.methods.addToPaycheck = function() {
         memo: "老师工资",
         amount: this.amount
       }
-      Paycheck.create(_paycheck, (err, paycheck) => {
+      mongoose.model('Paycheck').create(_paycheck, (err, paycheck) => {
         if(err) console.error(err);
       })
     } else {
@@ -149,7 +120,7 @@ reportSchema.methods.removeFromPaycheck = function(callback) {
     month: _month,
     paid: false
   }
-  Paycheck.findOne(paycheck_query, (err, pc) => {
+  mongoose.model('Paycheck').findOne(paycheck_query, (err, pc) => {
     if(err) {
       console.error(err)
     }
@@ -212,7 +183,7 @@ reportSchema.methods.recalculatePaycheck = async function() {
     _amount += report.amount 
   })
   pc.amount = _amount
-  pc.save()
+  await pc.save()
 }
 
 var Report = mongoose.model('Report', reportSchema);

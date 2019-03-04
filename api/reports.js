@@ -4,12 +4,12 @@
 
 const fs = require('fs');
 const express = require('express');
-const router = express.Router();
-const Report = require('../models/report');
-const Paycheck = require('../models/paycheck');
-const Tuition = require('../models/tuition');
-const Teacher = require('../models/teacher');
 const mongoose = require('mongoose');
+const router = express.Router();
+const Paycheck = require('../models/paycheck');
+const Course = require('../models/course');
+const Student = require('../models/student');
+const Report = require('../models/report');
 const multer  = require('multer');
 const authenticate = require('../middlewares/authenticate');
 var storage = multer.diskStorage({
@@ -62,7 +62,7 @@ router.get('/copy_report', authenticate, (req, res) => {
       situation: _report.situation || "",
       focus: _report.focus
     }
-    Report.create(copy, function(err, report) {
+    Report.create(copy, async function(err, report) {
       if(err) {
         console.error(err);
       }
@@ -73,8 +73,8 @@ router.get('/copy_report', authenticate, (req, res) => {
         });
       }
       // decrease course hour for student tuition
-      // report.decreaseTuitionCourseHour()
-      // add report to paycheck
+      report.decreaseStudentBalance()
+      
       report.addToPaycheck()
 
       res.json(report);
@@ -115,7 +115,7 @@ router.post('/', upload, authenticate, (req, res) => {
     }
   });
   
-	Report.create(_report, function(err, report) {
+	Report.create(_report, async function(err, report) {
 		if(err) {
 			console.error(err);
 		}
@@ -127,7 +127,7 @@ router.post('/', upload, authenticate, (req, res) => {
     }
 
     // decrease course hour for student tuition
-    // report.decreaseTuitionCourseHour()
+    report.decreaseStudentBalance()
 
     // add report to paycheck
     report.addToPaycheck()
@@ -239,7 +239,7 @@ router.delete('/:_id', (req, res) => {
   var query = {_id: req.params._id};
   
   // increase course hour for student tuition
-  Report.findOne(query, (err, report) => {
+  Report.findOne(query, async (err, report) => {
     if(err) {
       console.error(err)
     }
@@ -250,7 +250,7 @@ router.delete('/:_id', (req, res) => {
       });
     }
     
-    // report.increaseTuitionCourseHour()
+    report.increaseStudentBalance()
 
     report.removeFromPaycheck((error) => {
       Report.remove(query, (err, reports) => {

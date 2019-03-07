@@ -1,5 +1,7 @@
 /* 
  * @author: znz
+    paycheck amount 由反馈表 amount 和 compensation amount 组成
+    如果反馈表数目为0 则paycheck会被删除 
 */
 
 const express = require('express');

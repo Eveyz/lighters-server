@@ -1,8 +1,10 @@
 /* 
  * @author: znz
 
- report n-1 tuition  
- report n-1 paycheck  
+  report n-1 tuition  
+  report n-1 paycheck  
+  添加反馈表 要减去对应学生的tuition 增加相应老师的paycheck
+  删除反馈表 要增加对应学生的tuition 减去相应老师的paycheck 如果老师paycheck反馈表数目为0 则此paycheck也要被删除
 */
 
 var mongoose = require('mongoose');

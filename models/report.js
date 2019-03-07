@@ -133,7 +133,14 @@ reportSchema.methods.removeFromPaycheck = function(callback) {
       });
     }
     pc.reports = pc.reports.filter(report_id => report_id.toString() !== this._id.toString())
-    pc.save()
+    if(pc.reports.length == 0) {
+      // remove paycheck if no reprot exists
+      pc.remove()
+    } else {
+      // otherwise reduce paycheck amount 
+      pc.amount -= this.amount
+      pc.save()
+    }
   })
   callback()
 };

@@ -22,7 +22,7 @@ router.get('/', authenticate, (req, res) => {
 });
 
 router.get('/low_balance', authenticate, (req, res) => {
-	Student.find({}, (err, students) => {
+	Student.find( {"status": "active"}, (err, students) => {
 		if(err) {
 			console.error(err);
 		}

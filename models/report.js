@@ -160,6 +160,8 @@ reportSchema.methods.calculate = async function() {
       // match the specified rates
       if(tr.course_type === course.type && tr.course_level === course.level) {
         reportPrice = tr.rate
+        this.teacher_rate = reportPrice
+        console.log("specified found: ", reportPrice)
         return
       }
     })

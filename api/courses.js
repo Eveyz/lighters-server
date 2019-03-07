@@ -18,10 +18,9 @@ const authenticate = require('../middlewares/authenticate');
 router.get('/', utils.verifyAdmin, (req, res) => {
   // console.log(req.currentUser);
   var _query = req.query
-  if(req.query.status) {
+  if(req.query.teacher_id) {
     _query = {
-      "teachers": {"$in": [req.query.teacher_id]},
-      "status": req.query.status
+      "teachers": {"$in": [req.query.teacher_id]}
     }
   }
 	Course.find(_query, (err, courses) => {

@@ -24,7 +24,7 @@ router.post('/authenticate', (req, res) => {
         return res.status(404).json({
           error: true,
           status: 'error',
-          msg: '用户名错误'
+          msg: '用户不存在'
         });
       }
 

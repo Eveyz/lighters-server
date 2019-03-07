@@ -57,7 +57,7 @@ router.get('/', authenticate, (req, res) => {
     populate: {
       path: 'student_id',
       model: 'Student',
-      select: 'firstname lastname'
+      select: 'firstname lastname englishname'
     }
   }).populate('teacher_id', 'firstname lastname');
 });

@@ -81,7 +81,7 @@ reportSchema.methods.increaseStudentBalance = async function() {
   let course = await Course.findOne({_id: this.course_id})
   let student = await Student.findOne({_id: this.student_id})
   const _coruse_rate = utils.getReportCredit(this.situation) * course.course_rate
-  student.tuition_comment += _coruse_rate
+  student.tuition_amount += _coruse_rate
   await student.save()
 };
 

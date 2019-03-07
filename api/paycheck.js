@@ -14,34 +14,32 @@ const utils = require('../utils');
 
 /* Get Paychecks */
 router.get('/', authenticate, (req, res) => {
-	Paycheck.find(req.query, (err, paychecks) => {
+	Paycheck.find(req.query, async (err, paychecks) => {
 		if(err) {
 			console.error(err);
     }
 
     // when paycheck are fetched, calcualte report amount or paycheck amount when needed
-    // paychecks.forEach(async pc => {
-    //   if(pc.amount === 0) {
-    //     await Report.find({_id: {$in: pc.reports}}, async (err, reports) => {
-    //       await utils.asyncForEach(reports, async (_report) => {
-    //         // if report teacher rate is 0 then calculate first
-    //         if(_report.teacher_rate === 0) {
-    //           await _report.save().then(() => {
-    //             pc.amount += _report.amount
-    //             pc.save()
-    //           })
-    //         // otherwise add all the report amount to the report amount
-    //         } else {
-    //           pc.amount += _report.amount
-    //           pc.save()
-    //         }
-    //       })
-    //     })
-    //   }
-    //   pc.save()
-    // })
+    
+    let all_promises = []
+    for (const pc of paychecks) {
 
-    res.json(paychecks);
+      all_promises.push(async () => {
+        pc.amount = 0
+        let _reports = await Report.find({_id: {$in: pc.reports}})
+        _reports.forEach(async report => {
+          if(report.teacher_rate === 0) {
+            await report.save()
+            pc.amount += report.amount
+          } else {
+            pc.amount += report.amount
+          }
+        })
+        return pc.save()
+      })
+    }
+    await Promise.all(all_promises)
+    res.json(paychecks)
     
 	}).populate({
     path: 'reports',

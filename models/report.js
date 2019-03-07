@@ -53,9 +53,7 @@ reportSchema.pre("save", async function(next){
   if ( !this.created_at ) {
     this.created_at = currentDate;
   }
-  if(this.teacher_rate === 0) {
-    await this.calculate()
-  }
+  await this.calculate()
 
   next();
 });
@@ -186,7 +184,7 @@ reportSchema.methods.recalculatePaycheck = async function() {
     paid: false
   }
   let _amount = 0
-  let pc = await Paycheck.findOne(paycheck_query)
+  let pc = await mongoose.model('Paycheck').findOne(paycheck_query)
   let reports = await Report.find({_id: {$in: pc.reports}})
   reports.forEach(report => {
     _amount += report.amount 

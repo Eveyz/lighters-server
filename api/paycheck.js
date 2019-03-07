@@ -18,26 +18,26 @@ router.get('/', authenticate, (req, res) => {
     }
 
     // when paycheck are fetched, calcualte report amount or paycheck amount when needed
-    paychecks.forEach(async pc => {
-      if(pc.amount === 0) {
-        await Report.find({_id: {$in: pc.reports}}, async (err, reports) => {
-          await utils.asyncForEach(reports, async (_report) => {
-            // if report teacher rate is 0 then calculate first
-            if(_report.teacher_rate === 0) {
-              await _report.save().then(() => {
-                pc.amount += _report.amount
-                pc.save()
-              })
-            // otherwise add all the report amount to the report amount
-            } else {
-              pc.amount += _report.amount
-              pc.save()
-            }
-          })
-        })
-      }
-      pc.save()
-    })
+    // paychecks.forEach(async pc => {
+    //   if(pc.amount === 0) {
+    //     await Report.find({_id: {$in: pc.reports}}, async (err, reports) => {
+    //       await utils.asyncForEach(reports, async (_report) => {
+    //         // if report teacher rate is 0 then calculate first
+    //         if(_report.teacher_rate === 0) {
+    //           await _report.save().then(() => {
+    //             pc.amount += _report.amount
+    //             pc.save()
+    //           })
+    //         // otherwise add all the report amount to the report amount
+    //         } else {
+    //           pc.amount += _report.amount
+    //           pc.save()
+    //         }
+    //       })
+    //     })
+    //   }
+    //   pc.save()
+    // })
 
     res.json(paychecks);
     

@@ -191,17 +191,10 @@ router.post('/:_id', upload, authenticate, async (req, res) => {
       });
     }
 
-    // recalculate student balance:   1. 0 -> 0.5 or 1   2. 0.5 or 1 -> 0
+    // recalculate student balance
     const _credit = utils.getReportCredit(report.situation)
-    if(!needToPay && _credit > 0) {
-      // 1 situation, reduce student tuition
-      student.tuition_amount -= _credit * course.course_rate
-      student.save()
-    } else if(needToPay && _credit === 0) {
-      // 2 situation, increase student tuition
-      student.tuition_amount += utils.getReportCredit(previousSituation) * course.course_rate
-      student.save()
-    }
+    student.tuition_amount += (utils.getReportCredit(previousSituation) - _credit) * course.course_rate
+    student.save()
 
     // save to trigger calculate amount and updated time
     report.save().then(() => {

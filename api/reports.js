@@ -30,7 +30,7 @@ router.get('/', authenticate, (req, res) => {
 			console.error(err);
 		}
 		res.json(reports);
-	}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name').populate('student_id', 'lastname firstname').populate('future_books');
+	}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name course_rate').populate('student_id', 'lastname firstname englishname')
 });
 
 /* Copy Report */
@@ -182,6 +182,7 @@ router.post('/:_id', upload, authenticate, (req, res) => {
         msg: 'Report not found'
       });
     }
+    // no need to calculate student balance since the fee for each course is fixed
 
     // save to trigger calculate amount and updated time
     report.save().then(() => {

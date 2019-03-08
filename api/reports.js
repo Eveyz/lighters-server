@@ -12,6 +12,8 @@ const Student = require('../models/student');
 const Report = require('../models/report');
 const multer  = require('multer');
 const authenticate = require('../middlewares/authenticate');
+const utils = require('../utils');
+
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
     callback(null, 'public/audios/uploads')
@@ -139,7 +141,7 @@ router.post('/', upload, authenticate, (req, res) => {
 });
 
 /* Update report */
-router.post('/:_id', upload, authenticate, (req, res) => {
+router.post('/:_id', upload, authenticate, async (req, res) => {
   let _report = JSON.parse(req.body.report);
 
   if(req.files) {
@@ -172,7 +174,13 @@ router.post('/:_id', upload, authenticate, (req, res) => {
 
   var options = { new: true }; // newly updated record
 
-	Report.findOneAndUpdate(query, update, options, (err, report) =>{
+  const report = await Report.findOne(query)
+  const needToPay = report.credit > 0
+  const previousSituation = report.situation
+  let course = await Course.findOne({_id: report.course_id})
+  let student = await Student.findOne({_id: report.student_id})
+
+	Report.findOneAndUpdate(query, update, options, (err, report) => {
 		if(err) {
 			console.error(err);
     }
@@ -182,7 +190,18 @@ router.post('/:_id', upload, authenticate, (req, res) => {
         msg: 'Report not found'
       });
     }
-    // no need to calculate student balance since the fee for each course is fixed
+
+    // recalculate student balance:   1. 0 -> 0.5 or 1   2. 0.5 or 1 -> 0
+    const _credit = utils.getReportCredit(report.situation)
+    if(!needToPay && _credit > 0) {
+      // 1 situation, reduce student tuition
+      student.tuition_amount -= _credit * course.course_rate
+      student.save()
+    } else if(needToPay && _credit === 0) {
+      // 2 situation, increase student tuition
+      student.tuition_amount += utils.getReportCredit(previousSituation) * course.course_rate
+      student.save()
+    }
 
     // save to trigger calculate amount and updated time
     report.save().then(() => {

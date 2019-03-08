@@ -132,7 +132,7 @@ router.put('/:_id', authenticate, (req, res) => {
 
   var options = { new: true }; // newly updated record
 
-	Paycheck.findOneAndUpdate(query, update, options, (err, paycheck) =>{
+	Paycheck.findOneAndUpdate(query, update, options, async (err, paycheck) => {
 		if(err) {
 			console.error(err);
     }
@@ -141,6 +141,13 @@ router.put('/:_id', authenticate, (req, res) => {
         error: true,
         msg: 'Paycheck not found'
       });
+    }
+
+    // paycheck was paid need to update all reports from this paycheck to paid too
+    if(paycheck.paid) {
+      for (const report of paycheck.reports) {
+        await Report.findOneAndUpdate({_id: report._id}, {"paid": true}, {new: true})
+      }
     }
 
     res.json(paycheck);

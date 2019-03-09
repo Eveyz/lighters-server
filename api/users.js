@@ -18,7 +18,8 @@ const utils = require('../utils');
 
 router.post('/authenticate', (req, res) => {
   if(req.body.username && req.body.password) {
-    User.findOne({ username: req.body.username }, function(err, user) {
+    
+    User.findOne({ username: req.body.username }, async function(err, user) {
       if(err) console.error(err);
       if(!user) {
         return res.status(404).json({
@@ -26,106 +27,106 @@ router.post('/authenticate', (req, res) => {
           status: 'error',
           msg: '用户不存在'
         });
+      } else {
+        // User found, Don't include sensitive information in the token
+        const userTokenData = {
+          id: user.id, 
+          username: user.username, 
+          email: user.email, 
+          identity: user.identity, 
+          status: user.status
+        };
+        await user.validPassword(req.body.password, function(err, isMatch) {
+          if(err) console.error(err);
+          console.log('Password:', isMatch);
+          if(!isMatch) {
+            return res.status(404).json({
+              success: false,
+              status: 'error',
+              msg: '密码错误'
+            });
+          } else {
+            // password is right
+            const _expiredIn = req.body.remember_me ? '5h' : '2h';
+            jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: _expiredIn}, (err, token) => {
+              if(err) console.error(err);
+              if(user.identity === "teacher") {
+                Teacher.findOne({ user_id: user._id }, (err, teacher) => {
+                  if(err) console.error(err);
+    
+                  if(!teacher) {
+                    return res.status(301).json({
+                      token: token,
+                      teacher: ""
+                    });
+                  }
+                  res.json({
+                    token: token,
+                    teacher: teacher
+                  });
+                }).populate('courses').populate({
+                  path: 'courses',
+                  model: 'Course',
+                  populate: {
+                    path: 'books',
+                    model: 'Book',
+                    populate: {
+                      path: 'keywords',
+                      model: 'Keyword'
+                    }
+                  }
+                }).populate({
+                  path: 'courses',
+                  model: 'Course',
+                  populate: {
+                    path: 'students',
+                    model: 'Student'
+                  }
+                }).populate('students');
+              } else if (user.identity === "student") {
+                Student.findOne({ user_id: user._id }, (err, student) => {
+                  if(err) console.error(err);
+    
+                  if(!student) {
+                    return res.status(301).json({
+                      token: token,
+                      student: ""
+                    });
+                  }
+    
+                  res.json({
+                    token: token,
+                    student: student
+                  });
+                }).populate('courses').populate({
+                  path: 'courses',
+                  model: 'Course',
+                  populate: {
+                    path: 'books',
+                    model: 'Book',
+                    populate: {
+                      path: 'keywords',
+                      model: 'Keyword'
+                    }
+                  }
+                }).populate({
+                  path: 'courses',
+                  model: 'Course',
+                  populate: {
+                    path: 'teachers',
+                    model: 'Teacher'
+                  }
+                }).populate('teachers');
+              } else {
+                res.json({
+                  token
+                })
+              }
+              // response to login successfully => reducer => res.data.token
+            });
+          }
+        });
       }
-
-      // Don't include sensitive information in the token
-      const userTokenData = {
-        id: user.id, 
-        username: user.username, 
-        email: user.email, 
-        identity: user.identity, 
-        status: user.status
-      };
-
-      user.validPassword(req.body.password, function(err, isMatch) {
-        if(err) console.error(err);
-        console.log('Password:', isMatch);
-        if(!isMatch) {
-          return res.status(404).json({
-            success: false,
-            status: 'error',
-            msg: '密码错误'
-          });
-        }
-      });
-
-      const _expiredIn = req.body.remember_me ? '5h' : '2h';
-      jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: _expiredIn}, (err, token) => {
-        if(err) console.error(err);
-        if(user.identity === "teacher") {
-          Teacher.findOne({ user_id: user._id }, (err, teacher) => {
-            if(err) console.error(err);
-
-            if(!teacher) {
-              return res.status(301).json({
-                token: token,
-                teacher: ""
-              });
-            }
-            res.json({
-              token: token,
-              teacher: teacher
-            });
-          }).populate('courses').populate({
-            path: 'courses',
-            model: 'Course',
-            populate: {
-              path: 'books',
-              model: 'Book',
-              populate: {
-                path: 'keywords',
-                model: 'Keyword'
-              }
-            }
-          }).populate({
-            path: 'courses',
-            model: 'Course',
-            populate: {
-              path: 'students',
-              model: 'Student'
-            }
-          }).populate('students');
-        } else if (user.identity === "student") {
-          Student.findOne({ user_id: user._id }, (err, student) => {
-            if(err) console.error(err);
-
-            if(!student) {
-              return res.status(301).json({
-                token: token,
-                student: ""
-              });
-            }
-
-            res.json({
-              token: token,
-              student: student
-            });
-          }).populate('courses').populate({
-            path: 'courses',
-            model: 'Course',
-            populate: {
-              path: 'books',
-              model: 'Book',
-              populate: {
-                path: 'keywords',
-                model: 'Keyword'
-              }
-            }
-          }).populate({
-            path: 'courses',
-            model: 'Course',
-            populate: {
-              path: 'teachers',
-              model: 'Teacher'
-            }
-          }).populate('teachers');
-        } else {
-          res.json({
-            token
-          })
-        }
-        // response to login successfully => reducer => res.data.token
-      });
     });
   } else {
     res.status(400).json({

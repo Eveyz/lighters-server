@@ -7,6 +7,7 @@ const path = require('path');
 const router = express.Router();
 const Student = require('../models/student');
 const Report = require('../models/report');
+const Tuition = require('../models/tuition');
 const mongoose = require('mongoose');
 const authenticate = require('../middlewares/authenticate');
 
@@ -43,9 +44,29 @@ router.get('/low_balance', authenticate, (req, res) => {
 router.get('/:_id', (req, res) => {
 	let query = {_id: req.params._id};
 
-	Student.findOne(query, (err, student) => {
+	Student.findOne(query, async (err, student) => {
     if(err) console.error(err);
+
+    var all_promises = []
+    var courses = []
+    student.courses.forEach((course) => {
+      all_promises.push(
+        new Promise(async (resolve, reject) => {
+          const _reports = await Report.find({course_id: course._id, student_id: student._id}).populate('teacher_id', 'lastname firstname englishname')
+          course.reports = _reports
+          resolve(_reports)
+          courses.push(course)
+        })
+      )
+    })
+    await Promise.all(all_promises)
+    student.courses = courses
+
+    const _tuitions = await Tuition.find({student_id: student._id})
+    student._doc.tuitions = _tuitions
+
     res.json(student);
+
   }).populate('courses').populate({
     path: 'courses',
     model: 'Course',

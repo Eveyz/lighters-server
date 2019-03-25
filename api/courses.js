@@ -42,7 +42,7 @@ router.get('/', utils.verifyAdmin, (req, res) => {
       }
       await Promise.all(all_promises)
       res.json(response)
-    })
+    }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
   } else {
     Course.find(_query, (err, courses) => {
       if(err) {

@@ -175,7 +175,6 @@ router.post('/:_id', upload, authenticate, async (req, res) => {
   var options = { new: true }; // newly updated record
 
   const report = await Report.findOne(query)
-  const needToPay = report.credit > 0
   const previousSituation = report.situation
   let course = await Course.findOne({_id: report.course_id})
   let student = await Student.findOne({_id: report.student_id})

@@ -8,6 +8,7 @@ const router = express.Router();
 const Course = require('../models/course');
 const Teacher = require('../models/teacher');
 const Student = require('../models/student');
+const Report = require('../models/report');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const utils = require('../utils');
@@ -19,16 +20,37 @@ router.get('/', utils.verifyAdmin, (req, res) => {
   // console.log(req.currentUser);
   var _query = req.query
   if(req.query.teacher_id) {
+    // get courses data
     _query = {
       "teachers": {"$in": [req.query.teacher_id]}
     }
+    Course.find(_query, async (err, courses) => {
+      if(err) {
+        console.error(err);
+      }
+      var response = []
+      var all_promises = []
+      for (const course of courses) {
+        all_promises.push(
+          new Promise(async (resolve, reject) => {
+            let _count = await Report.find({course_id: course._id}).countDocuments()
+            resolve(_count)
+            course._doc["count"] = _count
+            response.push(course)
+          })
+        )
+      }
+      await Promise.all(all_promises)
+      res.json(response)
+    }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
+  } else {
+    Course.find(_query, (err, courses) => {
+      if(err) {
+        console.error(err);
+      }
+      res.json(courses);
+    }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
   }
-	Course.find(_query, (err, courses) => {
-		if(err) {
-			console.error(err);
-		}
-		res.json(courses);
-	}).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
 });
 
 /* Get course by id */

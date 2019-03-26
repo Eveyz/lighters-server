@@ -17,6 +17,7 @@ const config = require('../config');
 const utils = require('../utils');
 
 router.post('/authenticate', (req, res) => {
+  console.log("should be called")
   if(req.body.username && req.body.password) {
     
     User.findOne({ username: req.body.username }, async function(err, user) {

@@ -14,6 +14,7 @@ var courseSchema = new mongoose.Schema({
   level: String,
   code: String,
   type: String,
+  theme: String,
   status: { type: String, default: "active" },
   books: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Book'} ],
   teachers: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'} ],

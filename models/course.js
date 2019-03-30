@@ -14,7 +14,7 @@ var courseSchema = new mongoose.Schema({
   level: String,
   code: String,
   type: String,
-  theme: String,
+  theme: { type: String, default: "WorldStudies-title.jpg" },
   status: { type: String, default: "active" },
   books: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Book'} ],
   teachers: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'} ],

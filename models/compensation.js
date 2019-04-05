@@ -3,6 +3,7 @@
 */
 
 var mongoose = require('mongoose');
+const Paycheck = require('../models/paycheck');
 
 var compensationSchema = new mongoose.Schema({
   paycheck_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Paycheck'},
@@ -22,6 +23,31 @@ compensationSchema.pre("save", function(next){
   }
   next();
 });
+
+compensationSchema.methods.addToPaycheck = function() {
+  mongoose.model('Paycheck').findOne({_id: this.paycheck_id}, (err, pc) => {
+    if(err) console.error(err);
+    pc.compensatons.push(this)
+    pc.save()
+  })
+};
+
+compensationSchema.methods.removeFromPaycheck = function() {
+  mongoose.model('Paycheck').findOne({_id: this.paycheck_id}, (err, pc) => {
+    if(err) console.error(err);
+    pc.compensatons.push(this)
+    pc.save()
+  })
+};
+
+compensationSchema.methods.removeFromPaycheck = function(callback) {
+  mongoose.model('Paycheck').findOne({_id: this.paycheck_id}, (err, pc) => {
+    if(err) console.error(err);
+    pc.compensatons = pc.compensatons.filter(paycheck_id => paycheck_id.toString() !== this._id.toString())
+    pc.save()
+  })
+  callback()
+};
 
 var Compensation = mongoose.model('Compensation', compensationSchema);
 module.exports = Compensation;

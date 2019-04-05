@@ -59,7 +59,7 @@ router.get('/', authenticate, (req, res) => {
       model: 'Student',
       select: 'firstname lastname englishname'
     }
-  }).populate('teacher_id', 'firstname lastname');
+  }).populate('compensatons', 'type amount memo').populate('teacher_id', 'firstname lastname');
 });
 
 /* Get Paycheck by id */

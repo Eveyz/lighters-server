@@ -9,7 +9,7 @@ var db = mongoose.connect(url, options).then(
   },
   err => {
     console.error('App starting error:', err.stack);
-    process.exit(1);
+    // process.exit(1);
   }
 );
 

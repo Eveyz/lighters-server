@@ -33,8 +33,9 @@ router.post('/', authenticate, (req, res) => {
 	var body = req.body;
 	Compensation.create(body, function(err, compensation) {
 		if(err) {
-			console.error(err);
+			console.error(err)
 		}
+		compensation.addToPaycheck()
 		res.json(compensation);
 	})
 });
@@ -65,14 +66,17 @@ router.put('/:_id', authenticate, (req, res) => {
 });
 
 /* Delete Compensation */
-router.delete('/:_id', (req, res) => {
+router.delete('/:_id', async (req, res) => {
 	var query = {_id: req.params._id};
-	
-	Compensation.remove(query, (err, compensations) => {
-		if(err) {
-			console.error(err);
-		}
-		res.json(compensations);
+
+	const c = await Compensation.findOne(query)
+	c.removeFromPaycheck((error) => {
+		Compensation.remove(query, (err, compensations) => {
+			if(err) {
+				console.error(err);
+			}
+			res.json(compensations);
+		})
 	})
 });
 

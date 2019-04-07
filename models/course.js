@@ -9,7 +9,7 @@ var courseSchema = new mongoose.Schema({
   student_id: Number,
   capacity: Number,
   course_hours: Number,
-  course_rate: { type: Number, default: 70 },
+  course_rate: { type: Number, default: 70 }, // 每节课每个学生收取的费用
   name: String,
   level: String,
   code: String,

@@ -85,7 +85,7 @@ reportSchema.methods.increaseStudentBalance = async function() {
   await student.save()
 };
 
-reportSchema.methods.addToPaycheck = async function() {
+reportSchema.methods.addToPaycheck = function() {
   const _month = this.course_date.substring(0, 7)
   const paycheck_query = {
     teacher_id: this.teacher_id,

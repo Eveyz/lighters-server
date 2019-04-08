@@ -64,7 +64,7 @@ router.get('/copy_report', authenticate, (req, res) => {
       situation: _report.situation || "",
       focus: _report.focus
     }
-    Report.create(copy, async function(err, report) {
+    Report.create(copy, function(err, report) {
       if(err) {
         console.error(err);
       }
@@ -117,7 +117,7 @@ router.post('/', upload, authenticate, (req, res) => {
     }
   });
   
-	Report.create(_report, async function(err, report) {
+	Report.create(_report, function(err, report) {
 		if(err) {
 			console.error(err);
 		}

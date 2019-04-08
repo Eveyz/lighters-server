@@ -6,7 +6,6 @@ const fs = require('fs');
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-const Paycheck = require('../models/paycheck');
 const Course = require('../models/course');
 const Student = require('../models/student');
 const Report = require('../models/report');
@@ -191,8 +190,8 @@ router.post('/:_id', upload, authenticate, async (req, res) => {
     }
 
     // recalculate student balance
-    const _credit = utils.getReportCredit(report.situation)
-    student.tuition_amount += (utils.getReportCredit(previousSituation) - _credit) * course.course_rate
+    const _credit = utils.getStudentReportCredit(report.situation)
+    student.tuition_amount += (utils.getStudentReportCredit(previousSituation) - _credit) * course.course_rate
     student.save()
 
     // save to trigger calculate amount and updated time

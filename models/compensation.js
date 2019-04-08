@@ -27,7 +27,7 @@ compensationSchema.pre("save", function(next){
 compensationSchema.methods.addToPaycheck = function() {
   mongoose.model('Paycheck').findOne({_id: this.paycheck_id}, (err, pc) => {
     if(err) console.error(err);
-    pc.compensatons.push(this)
+    pc.compensations.push(this)
     pc.save()
   })
 };
@@ -35,7 +35,7 @@ compensationSchema.methods.addToPaycheck = function() {
 compensationSchema.methods.removeFromPaycheck = function() {
   mongoose.model('Paycheck').findOne({_id: this.paycheck_id}, (err, pc) => {
     if(err) console.error(err);
-    pc.compensatons.push(this)
+    pc.compensations.push(this)
     pc.save()
   })
 };
@@ -43,7 +43,7 @@ compensationSchema.methods.removeFromPaycheck = function() {
 compensationSchema.methods.removeFromPaycheck = function(callback) {
   mongoose.model('Paycheck').findOne({_id: this.paycheck_id}, (err, pc) => {
     if(err) console.error(err);
-    pc.compensatons = pc.compensatons.filter(paycheck_id => paycheck_id.toString() !== this._id.toString())
+    pc.compensations = pc.compensations.filter(paycheck_id => paycheck_id.toString() !== this._id.toString())
     pc.save()
   })
   callback()

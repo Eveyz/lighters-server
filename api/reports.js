@@ -57,7 +57,7 @@ router.get('/copy_report', authenticate, (req, res) => {
       external_link: _report.external_link || "",
       audios: _report.audios || [],
       audios_files: _report.audios_files || [],
-      paid: _report.paid || false,
+      paid: false,
       credit: _report.credit || 1,
       status: _report.status || "active",
       situation: _report.situation || "",

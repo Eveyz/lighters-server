@@ -51,6 +51,14 @@ server.use('/transactions', transactionsAPI);
 server.use('/tuitions', tuitionsAPI);
 server.use('/teacher_rates', teacherRatesAPI);
 
+server.use((req, res) => {
+  res.status(404).json({error: "not found"})
+})
+
+server.use((error, req, res, next) => {
+  res.status(500).json({error: error.message})
+})
+
 /* MongoDB connection 
  * @author: znz
 */

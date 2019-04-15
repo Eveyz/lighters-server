@@ -195,6 +195,7 @@ router.post('/:_id', upload, authenticate, async (req, res) => {
     student.tuition_amount += (utils.getStudentReportCredit(previousSituation) - _credit) * course.course_rate
     student.save()
 
+    // if month changes, remove report from previous month paycheck and add to new month paycheck
     if(prev_course_date !== report.course_date) {
       report.updatePaycheckReports(prev_course_date)
     }

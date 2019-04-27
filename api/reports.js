@@ -31,7 +31,7 @@ router.get('/', authenticate, (req, res) => {
 			console.error(err);
 		}
 		res.json(reports);
-	}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name course_rate').populate('student_id', 'lastname firstname englishname')
+	}).sort({created_at: -1}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name course_rate').populate('student_id', 'lastname firstname englishname')
 });
 
 /* Copy Report */

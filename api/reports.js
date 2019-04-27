@@ -175,7 +175,7 @@ router.post('/:_id', upload, authenticate, async (req, res) => {
 
   const prev_report = await Report.findOne(query)
   const previousSituation = prev_report.situation
-  const prev_course_date = prev_report.course_date
+  const prev_course_month = prev_report.course_date.substring(0, 7)
   let course = await Course.findOne({_id: prev_report.course_id})
   let student = await Student.findOne({_id: prev_report.student_id})
 
@@ -195,8 +195,9 @@ router.post('/:_id', upload, authenticate, async (req, res) => {
     student.tuition_amount += (utils.getStudentReportCredit(previousSituation) - _credit) * course.course_rate
     student.save()
 
-    if(prev_course_date !== report.course_date) {
-      report.updatePaycheckReports(prev_course_date)
+    // if month changes, remove report from previous month paycheck and add to new month paycheck
+    if(prev_course_month !== report.course_date.substring(0, 7)) {
+      report.updatePaycheckReports(prev_course_month)
     }
 
     // save to trigger calculate amount and updated time

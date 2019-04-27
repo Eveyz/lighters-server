@@ -145,18 +145,18 @@ reportSchema.methods.removeFromPaycheck = function(callback) {
   callback()
 };
 
-reportSchema.methods.updatePaycheckReports = function(prev_course_date) {
+reportSchema.methods.updatePaycheckReports = function(prev_course_month) {
   // remove report from prev month
-  const prev_month = prev_course_date.substring(0, 7)
   const prev_paycheck_query = {
     teacher_id: this.teacher_id,
-    month: prev_month,
+    month: prev_course_month,
     paid: false
   }
   mongoose.model('Paycheck').findOne(prev_paycheck_query, (err, pc) => {
     if(err) {
       console.error(err)
     }
+    // remove report from paycheck since month not right
     pc.reports = pc.reports.filter(report_id => report_id.toString() !== this._id.toString())
     if(pc.reports.length == 0) {
       // remove paycheck if no reprot exists
@@ -166,10 +166,12 @@ reportSchema.methods.updatePaycheckReports = function(prev_course_date) {
       pc.amount -= this.amount
       pc.save()
     }
+    // add report to current month
+    if(prev_course_month !== this.course_date.substring(0, 7)) {
+      this.addToPaycheck()
+    }
   })
 
-  // add report to current month
-  this.addToPaycheck()
 }
 
 reportSchema.methods.calculate = async function() {

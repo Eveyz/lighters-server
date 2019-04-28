@@ -30,7 +30,9 @@ router.get('/', authenticate, (req, res) => {
 		if(err) {
 			console.error(err);
 		}
-		res.json(reports);
+		res.json(reports.sort((a, b) => {
+      return a.course_date > b.course_date ? -1 : (a.course_date < b.course_date ? 1 : 0)
+    }));
 	}).sort({created_at: -1}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name course_rate').populate('student_id', 'lastname firstname englishname')
 });
 

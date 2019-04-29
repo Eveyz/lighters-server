@@ -76,7 +76,7 @@ function getStudyID(number) {
   return res;
 }
 
-export const getReportCredit = (situation) => {
+const getReportCredit = (situation) => {
   let res;
   switch(situation) {
     case ("正常上课"):
@@ -104,7 +104,7 @@ export const getReportCredit = (situation) => {
   return res;
 }
 
-export const getStudentReportCredit = (situation) => {
+const getStudentReportCredit = (situation) => {
   let res;
   switch(situation) {
     case ("正常上课"):

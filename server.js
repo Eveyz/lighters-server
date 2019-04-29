@@ -78,3 +78,5 @@ const PORT = process.env.PORT || config.port;
 server.listen(PORT, () => {
   console.info('Express listenning on port ', PORT);
 });
+
+module.exports = server

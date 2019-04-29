@@ -107,18 +107,20 @@ router.post('/', upload, authenticate, (req, res) => {
   _report.student_id = _student_id;
   _report.audios = [];
 
-  req.files.forEach(file => {
-    let _file = {
-      originalname: file.originalname,
-      filename: file.filename,
-      path: file.path
-    };
-    if(_report.audios_files.indexOf(_file) === -1) {
-      _report.audios_files.push(_file);
-    }
-  });
+  if(req.files) {
+    req.files.forEach(file => {
+      let _file = {
+        originalname: file.originalname,
+        filename: file.filename,
+        path: file.path
+      };
+      if(_report.audios_files.indexOf(_file) === -1) {
+        _report.audios_files.push(_file);
+      }
+    });
+  }
   
-	Report.create(_report, function(err, report) {
+	Report.create(_report, async function(err, report) {
 		if(err) {
 			console.error(err);
 		}
@@ -130,7 +132,7 @@ router.post('/', upload, authenticate, (req, res) => {
     }
 
     // decrease course hour for student tuition
-    report.decreaseStudentBalance()
+    await report.decreaseStudentBalance()
 
     // add report to paycheck
     report.addToPaycheck()
@@ -269,7 +271,7 @@ router.delete('/:_id', (req, res) => {
       });
     }
     
-    report.increaseStudentBalance()
+    await report.increaseStudentBalance()
 
     report.removeFromPaycheck((error) => {
       Report.remove(query, (err, reports) => {

@@ -158,6 +158,40 @@ describe('Report API test', () => {
     })
   })
 
+  describe('/COPY reports', () => {
+    it('it should copy a report', (done) => {
+      chai.request(server)
+          .get(`/copy_report`)
+          .end(async (err, res) => {
+            res.should.have.status(200)
+            res.body.should.be.a('object')
+
+            const copied_report = res.body
+            // check report credit and amount
+            assert(copied_report.credit === 1)
+            assert(copied_report.amount === 200)
+
+            const updated_student = await Student.findOne({_id: copied_report.student_id})
+            // check if student tuition amount is decreased
+            assert(updated_student.tuition_amount === 800)
+
+            // create paycheck and add report to paycheck
+            const paycheck = await Paycheck.findOne({
+              teacher_id: copied_report.teacher_id,
+              student_id: copied_report.student_id,
+              course_id: copied_report.course_id,
+              month: copied_report.course_date.substring(0, 7)
+            })
+            assert(paycheck !== null)
+            assert(!paycheck.isNew)
+            // report is in paycheck reports
+            assert.notEqual(-1, paycheck.reports.indexOf(copied_report._id))
+
+            done()
+          })
+    })
+  })
+
   after(() => {
     mongoose.connection.close()
   })

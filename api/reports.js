@@ -38,7 +38,7 @@ router.get('/', authenticate, (req, res) => {
 
 /* Copy Report */
 router.get('/copy_report', authenticate, (req, res) => {
-  var _query = {_id: req.query.report_id};
+  var _query = {_id: req.query.report_id}
 	Report.findOne(_query, (err, _report) => {
 		if(err) {
 			console.error(err);

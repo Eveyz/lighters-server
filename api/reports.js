@@ -65,7 +65,7 @@ router.get('/copy_report', authenticate, (req, res) => {
       situation: _report.situation || "",
       focus: _report.focus
     }
-    Report.create(copy, function(err, report) {
+    Report.create(copy, async function(err, report) {
       if(err) {
         console.error(err);
       }
@@ -76,9 +76,9 @@ router.get('/copy_report', authenticate, (req, res) => {
         });
       }
       // decrease course hour for student tuition
-      report.decreaseStudentBalance()
+      await report.decreaseStudentBalance()
       
-      report.addToPaycheck()
+      await report.addToPaycheck()
 
       res.json(report);
     });
@@ -135,7 +135,7 @@ router.post('/', upload, authenticate, (req, res) => {
     await report.decreaseStudentBalance()
 
     // add report to paycheck
-    report.addToPaycheck()
+    await report.addToPaycheck()
 
     // res
     res.json(report);
@@ -274,7 +274,7 @@ router.delete('/:_id', (req, res) => {
     await report.increaseStudentBalance()
 
     report.removeFromPaycheck((error) => {
-      Report.remove(query, (err, reports) => {
+      Report.deleteOne(query, (err) => {
       	if(err) {
       		return res.status(404).json({
             success: false,
@@ -286,7 +286,6 @@ router.delete('/:_id', (req, res) => {
           success: true,
           msg: "Report successfully deleted"
         };
-        console.log("called")
       	res.json(response);
       })
     })

@@ -85,14 +85,14 @@ reportSchema.methods.increaseStudentBalance = async function() {
   await student.save()
 };
 
-reportSchema.methods.addToPaycheck = function() {
+reportSchema.methods.addToPaycheck = async function() {
   const _month = this.course_date.substring(0, 7)
   const paycheck_query = {
     teacher_id: this.teacher_id,
     month: _month,
     paid: false
   }
-  mongoose.model('Paycheck').findOne(paycheck_query, (err, pc) => {
+  mongoose.model('Paycheck').findOne(paycheck_query, async (err, pc) => {
     if(err) console.error(err);
     if(!pc) {
       const _paycheck = {
@@ -110,7 +110,7 @@ reportSchema.methods.addToPaycheck = function() {
     } else {
       pc.amount += this.amount
       pc.reports.push(this)
-      pc.save()
+      await pc.save()
     }
   })
 };

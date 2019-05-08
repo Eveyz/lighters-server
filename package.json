@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon --exec babel-node server.js --ignore public/",
-    "test": "NODE_ENV=test mocha --recursive --timeout 10000000 --exit",
+    "test": "cross-env NODE_ENV=test mocha --recursive --timeout 10000000 --exit",
     "init": "node ./tasks/devInit.js",
     "prod": "cross-env NODE_ENV=production nodemon --exec babel-node server.js --ignore public/"
   },

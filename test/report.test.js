@@ -132,7 +132,7 @@ describe('Report API test', () => {
             res.should.have.status(200)
             res.body.should.be.a('object')
 
-            const report = res.body
+            report = res.body
             // check report credit and amount
             assert(report.credit === 1)
             assert(report.amount === 200)
@@ -162,7 +162,14 @@ describe('Report API test', () => {
     it('it should copy a report', (done) => {
       chai.request(server)
           .get(`/copy_report`)
+          .query({
+            course_id: course._id.toString(),
+            student_id: student._id.toString(),
+            teacher_id: teacher._id.toString(),
+            report_id: report._id.toString(),
+          })
           .end(async (err, res) => {
+            console.log(res.body)
             res.should.have.status(200)
             res.body.should.be.a('object')
 

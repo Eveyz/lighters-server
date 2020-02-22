@@ -44,7 +44,10 @@ router.get('/copy_report', authenticate, (req, res) => {
 			console.error(err);
     }
     if(!_report) {
-      console.error("Report not found")
+      return res.status(200).json({
+        error: true,
+        msg: 'Report not found'
+      })
     }
     const copy = {
       teacher_id: req.query.teacher_id,
@@ -72,7 +75,7 @@ router.get('/copy_report', authenticate, (req, res) => {
       if(!report) {
         return res.status(404).json({
           error: true,
-          msg: 'Report not found'
+          msg: 'Report not created'
         });
       }
       // decrease course hour for student tuition

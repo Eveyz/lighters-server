@@ -12,12 +12,34 @@ const Course = require('../models/course');
 const Teacher = require('../models/teacher');
 const Student = require('../models/student');
 const Paycheck = require('../models/paycheck');
+const Audit = require('../models/audit');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const utils = require('../utils');
 
+function getRequestIpAddress(request) {
+  const requestIpAddress = request.headers['X-Forwarded-For'] || request.connection.remoteAddress
+  if (!requestIpAddress) return null
+
+  const ipv4 = new RegExp("(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)")
+
+  const [ipAddress] = requestIpAddress.match(ipv4)
+
+  return ipAddress
+}
+
 router.post('/authenticate', (req, res) => {
   if(req.body.username && req.body.password) {
+    // audit user ip
+    let ip = getRequestIpAddress(req)
+    Audit.create({
+      username: req.body.username,
+      remote_ip: ip
+    }, function(err, book) {
+      if(err) {
+        console.error(err);
+      }
+    });
     
     User.findOne({ username: req.body.username }, async function(err, user) {
       if(err) console.error(err);

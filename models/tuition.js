@@ -12,6 +12,7 @@ var tuitionSchema = new mongoose.Schema({
   remain: Number,
   amount: Number,
   status: { type: String, default: "" },
+  time: { type: Date, default: new Date() },
   created_at: Date,
   updated_at: Date
 });

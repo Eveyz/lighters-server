@@ -42,14 +42,35 @@ router.get('/', utils.verifyAdmin, (req, res) => {
       }
       await Promise.all(all_promises)
       res.json(response)
-    }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
+    }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students', 'lastname firstname englishname ');
+  } else if(req.query.field) {
+    // query courses grouping by field
+    var field = req.query.field
+    var grouped_active_courses = {}
+    var grouped_inactive_courses = {}
+    Course.find((err, courses) => {
+      if(err) {
+        console.error(err)
+      }
+      courses.forEach(course => {
+        let grouped_courses = course["status"] === "active" ? grouped_active_courses : grouped_inactive_courses
+        if(!(course[field] in grouped_courses)) {
+          grouped_courses[course[field]] = []
+        }
+        grouped_courses[course[field]].push(course)
+      })
+      res.json({
+        active: grouped_active_courses,
+        inactive: grouped_inactive_courses
+      })
+    }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students', 'lastname firstname englishname');
   } else {
     Course.find(_query, (err, courses) => {
       if(err) {
         console.error(err);
       }
       res.json(courses);
-    }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students');
+    }).populate('books').populate('teachers', 'lastname firstname englishname').populate('students', 'lastname firstname englishname');
   }
 });
 

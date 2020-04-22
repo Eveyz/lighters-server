@@ -245,17 +245,17 @@ router.get('/from/token', utils.verifyToken, (req, res) => {
 router.get('/admin/init', utils.verifyAdmin, async (req, res) => {
   var _books, _courses, _students, _teachers, _paychecks;
 
-  _books = await Book.find({})
-  _courses = await Course.find({})
-  _students = await Student.find({})
-  _teachers = await Teacher.find({})
+  _books = await Book.estimatedDocumentCount({})
+  _courses = await Course.estimatedDocumentCount({})
+  _students = await Student.estimatedDocumentCount({})
+  _teachers = await Teacher.estimatedDocumentCount({})
   _paychecks = await Paycheck.find({"paid": false})
 
   res.json({
-    books: _books.length,
-    courses: _courses.length,
-    students: _students.length,
-    teachers: _teachers.length,
+    books: _books,
+    courses: _courses,
+    students: _students,
+    teachers: _teachers,
     paychecks: _paychecks.length
   })
 });

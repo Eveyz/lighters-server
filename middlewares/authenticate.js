@@ -27,10 +27,10 @@ const Authenticate = (req, res, next) => {
       }
     });
   } else {
-    res.status(403).json({
-      error: 'No token provided. Unanthorized actions'
-    });
-    // next();
+    // res.status(403).json({
+    //   error: 'No token provided. Unanthorized actions'
+    // });
+    next();
   }
 }
 

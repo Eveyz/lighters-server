@@ -69,7 +69,7 @@ router.post('/authenticate', (req, res) => {
             });
           } else {
             // password is right
-            const _expiredIn = req.body.remember_me ? '7d' : '48h';
+            const _expiredIn = req.body.remember_me ? '30d' : '7d';
             jwt.sign({userTokenData}, config.jwtSecret, { expiresIn: _expiredIn}, (err, token) => {
               if(err) console.error(err);
               if(user.identity === "teacher") {

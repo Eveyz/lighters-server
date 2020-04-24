@@ -11,7 +11,7 @@ const Authenticate = (req, res, next) => {
 
   if(token) {
     jwt.verify(token, config.jwtSecret, (err, tokenData) => {
-      if(err) { 
+      if(err) {
         res.status(401).json({error: 'Failed to authenticate'}); 
       } else {
         User.findById({'_id': tokenData.userTokenData.id}, function(err, user) {
@@ -27,10 +27,10 @@ const Authenticate = (req, res, next) => {
       }
     });
   } else {
-    // res.status(403).json({
-    //   error: 'No token provided. Unanthorized actions'
-    // });
-    next();
+    res.status(403).json({
+      error: 'No token provided. Unanthorized actions'
+    });
+    // next();
   }
 }
 

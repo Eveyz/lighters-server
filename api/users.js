@@ -141,7 +141,7 @@ router.post('/authenticate', (req, res) => {
                 }).populate('teachers');
               } else {
                 res.json({
-                  token
+                  token: token
                 })
               }
               // response to login successfully => reducer => res.data.token

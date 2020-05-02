@@ -23,7 +23,7 @@
     "jake": "^10.6.1",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "mongodb": "^3.1.6",
     "mongoose": "^5.2.17",
     "morgan": "^1.9.1",

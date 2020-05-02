@@ -11,6 +11,15 @@ const config = require('../config');
 const authenticate = require('../middlewares/authenticate');
 
 /* Get Schedules */
+router.get('/', authenticate, (req, res) => {
+	Schedule.find((err, schedules) => {
+		if(err) {
+			console.error(err);
+		}
+		res.json(schedules);
+	});
+});
+
 router.post('/query_courses', authenticate, (req, res) => {
 	const query = {
 		course_id: { "$in": req.body.courses_ids	}

@@ -88,6 +88,64 @@ router.get('/:_id', (req, res) => {
   });
 });
 
+/* Get Student by id */
+router.post('/:_id/recalculate', (req, res) => {
+	let query = {_id: req.params._id};
+
+	let _student = req.body;
+
+	let update = {
+		'$set': _student
+	};
+
+  var options = { new: true }; // newly updated record
+
+	Student.findOneAndUpdate(query, update, options, async (err, student) =>{
+		if(err) {
+			console.error(err);
+    }
+
+    var all_promises = []
+    var courses = []
+    student.courses.forEach((course) => {
+      all_promises.push(
+        new Promise(async (resolve, reject) => {
+          const _reports = await Report.find({course_id: course._id, student_id: student._id}).populate('teacher_id', 'lastname firstname englishname')
+          course.reports = _reports
+          resolve(_reports)
+          courses.push(course)
+        })
+      )
+    })
+    await Promise.all(all_promises)
+    student.courses = courses
+
+    const _tuitions = await Tuition.find({student_id: student._id})
+    student._doc.tuitions = _tuitions
+
+    res.json(student);
+
+  }).populate('courses').populate({
+    path: 'courses',
+    model: 'Course',
+    populate: {
+      path: 'books',
+			model: 'Book',
+			populate: {
+				path: 'keywords',
+				model: 'Keyword'
+			}
+    }
+  }).populate({
+    path: 'courses',
+    model: 'Course',
+    populate: {
+      path: 'teachers',
+      model: 'Teacher'
+    }
+  });
+});
+
 /* Get student by id */
 router.get('/:_id/reports', (req, res) => {
 	// let _id = mongoose.Types.ObjectId(req.params._id);

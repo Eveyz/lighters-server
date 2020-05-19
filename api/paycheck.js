@@ -59,7 +59,7 @@ router.get('/', authenticate, (req, res) => {
       model: 'Student',
       select: 'firstname lastname englishname'
     }
-  }).populate('compensations', 'type amount memo').populate('teacher_id', 'firstname lastname');
+  }).populate('compensations', 'type amount memo').populate('teacher_id', 'firstname lastname level');
 });
 
 /* Get Paycheck by id */
@@ -118,7 +118,7 @@ router.post('/', authenticate, (req, res) => {
       model: 'Student',
       select: 'firstname lastname'
     }
-  }).populate('teacher_id', 'firstname lastname');
+  }).populate('teacher_id', 'firstname lastname level');
 });
 
 /* Update Paycheck */
@@ -169,7 +169,7 @@ router.put('/:_id', authenticate, (req, res) => {
       model: 'Student',
       select: 'firstname lastname'
     }
-  }).populate('teacher_id', 'firstname lastname');;
+  }).populate('teacher_id', 'firstname lastname level');;
 });
 
 /* Delete Paycheck */

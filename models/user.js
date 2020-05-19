@@ -20,6 +20,7 @@ var userSchema = new mongoose.Schema({
   temporaryPassword: { type: String, required: false },
   password: { type: String, required: true },
   passwordCon: { type: String, required: true },
+  reset_password_token: { type: String },
   admin: { type: Boolean, default: false },
   remember: { type: Boolean, default: false },
   consent: { type: Boolean, default: false },

@@ -10,12 +10,31 @@ const authenticate = require('../middlewares/authenticate');
 
 /* Get Teachers */
 router.get('/', authenticate, (req, res) => {
-	Teacher.find(req.query, (err, teachers) => {
-		if(err) {
-			console.error(err);
-		}
-		res.json(teachers);
-	})
+	if(req.query.group_by) {
+		Teacher.find({}, (err, teachers) => {
+			if(err) {
+				console.error(err);
+			}
+			var data = {
+				"pending": [], 
+				"active": [],
+				"system": []
+			}
+			teachers.forEach((teacher) => {
+				if(teacher.status === "pending") data["pending"].push(teacher);
+				else if(teacher.status === "active" || teacher.status === "RESET_REQUIRED") data["active"].push(teacher);
+				if(teacher.temporary) data["system"].push(teacher);
+			});
+			res.json(data);
+		})
+	} else {
+		Teacher.find(req.query, (err, teachers) => {
+			if(err) {
+				console.error(err);
+			}
+			res.json(teachers);
+		})
+	}
 });
 
 /* Get Teacher by id */

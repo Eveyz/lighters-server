@@ -16,6 +16,11 @@ const Audit = require('../models/audit');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const utils = require('../utils');
+const crypto = require('crypto');
+const hbs = require('nodemailer-express-handlebars');
+const nodemailer = require('nodemailer');
+const async = require('async')
+let bcrypt = require('bcrypt-nodejs');
 
 function getRequestIpAddress(request) {
   const requestIpAddress = request.headers['X-Forwarded-For'] || request.connection.remoteAddress
@@ -31,15 +36,15 @@ function getRequestIpAddress(request) {
 router.post('/authenticate', (req, res) => {
   if(req.body.username && req.body.password) {
     // audit user ip
-    let ip = getRequestIpAddress(req)
-    Audit.create({
-      username: req.body.username,
-      remote_ip: ip
-    }, function(err, book) {
-      if(err) {
-        console.error(err);
-      }
-    });
+    // let ip = getRequestIpAddress(req)
+    // Audit.create({
+    //   username: req.body.username,
+    //   remote_ip: ip
+    // }, function(err, book) {
+    //   if(err) {
+    //     console.error(err);
+    //   }
+    // });
     
     User.findOne({ username: req.body.username }, async function(err, user) {
       if(err) console.error(err);
@@ -278,5 +283,124 @@ router.get('/admin/init', utils.verifyAdmin, async (req, res) => {
 //     }
 //   });
 // });
+
+/* Send reset password email */
+router.post('/send_reset_password_email', (req, res) => {
+  const email = process.env.MAILER_EMAIL_ID || 'lightersenglish@gmail.com';
+  const pass = process.env.MAILER_PASSWORD || 'auth_email_pass';
+
+  var smtpTransport = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: email,
+      pass: pass
+    }
+  });
+  
+  var handlebarsOptions = {
+    viewEngine: {
+      extName: '.hbs',
+      partialsDir: path.join(__dirname, '../templates/partials'),
+      layoutsDir: path.join(__dirname, '../templates/'),
+    },
+    viewPath: path.join(__dirname, '../templates/'),
+    extName: '.hbs',
+  };
+  
+  smtpTransport.use('compile', hbs(handlebarsOptions));
+
+  async.waterfall([
+    function(done) {
+      User.findOne({
+        username: req.body.username
+      }).exec(function(err, user) {
+        if (user) {
+          done(err, user);
+        } else {
+          done('User not found.');
+          return res.json({
+            success: false,
+            message: '用户名不正确' 
+          });
+        }
+      });
+    },
+    function(user, done) {
+      // create the random token
+      crypto.randomBytes(20, function(err, buffer) {
+        var token = buffer.toString('hex');
+        done(err, user, token);
+      });
+    },
+    function(user, token, done) {
+      User.findOneAndUpdate({ _id: user._id }, { reset_password_token: token, reset_password_expires: Date.now() + 86400000 }, { upsert: true, new: true }).exec(function(err, new_user) {
+        done(err, token, new_user);
+      });
+    },
+    function(token, user, done) {
+      var data = {
+        to: req.body.email,
+        from: email,
+        template: 'reset_password',
+        subject: '重置密码',
+        context: {
+          url: `http://localhost:3001/users/reset_password?token=${token}`,
+          name: user.username
+        }
+      };
+
+      smtpTransport.sendMail(data, function(err) {
+        if (!err) {
+          return res.json({
+            success: true,
+            message: 'Kindly check your email for further instructions' 
+          });
+        } else {
+          return done(err);
+        }
+      });
+    }
+  ], function(err) {
+    res.status(422).json({'error': 'Missing information'});
+  })
+});
+
+/* Send reset password email */
+router.post('/reset_password', (req, res) => {
+
+  if(req.body.token && req.body.password && req.body.passwordCon) {
+    async.waterfall([
+      function(done) {
+        User.findOne({
+          reset_password_token: req.body.token
+        }).exec(function(err, user) {
+          if (user) {
+            done(err, user);
+          } else {
+            done('User not found.');
+          }
+        });
+      },
+      function(user, done) {
+        User.findOneAndUpdate({ _id: user._id }, { 
+          password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(8), null), 
+          passwordCon: bcrypt.hashSync(req.body.passwordCon, bcrypt.genSaltSync(8), null),
+          updated_at: new Date()
+        }, { upsert: true, new: true }).exec(function(err, newUser) {
+          if(err) {
+            done(err)
+          }
+          res.json({
+            username: newUser.username
+          })
+        });
+      },
+    ], function(err) {
+      res.status(422).json({'error': 'Missing information'});
+    })
+	} else {
+    res.status(300).json({'error': 'Missing information'});
+  }
+})
 
 module.exports = router;

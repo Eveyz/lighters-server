@@ -24,6 +24,7 @@ const tuitionsAPI = require("./api/tuition");
 const teacherRatesAPI = require("./api/teacher_rates");
 
 const server = express();
+require('dotenv').config();
 
 // Express Middleware
 server.use(logger('dev'));

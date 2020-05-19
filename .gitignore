@@ -6,5 +6,6 @@
 /uploads
 /build
 
+.env
 .DS_Store
 *.http

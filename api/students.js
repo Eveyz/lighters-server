@@ -8,6 +8,7 @@ const router = express.Router();
 const Student = require('../models/student');
 const Report = require('../models/report');
 const Tuition = require('../models/tuition');
+const Transaction = require('../models/transaction');
 const mongoose = require('mongoose');
 const authenticate = require('../middlewares/authenticate');
 
@@ -204,6 +205,58 @@ router.put('/:_id', authenticate, (req, res) => {
       });
     }
     res.json(student);
+	});
+});
+
+/* Deactivate Student */
+router.put('/:_id/deactivate', authenticate, (req, res) => {
+  
+  let query = {_id: req.params._id};
+	let update = {
+		'$set': {
+      status: "inactive",
+      tuition_amount: 0
+    }
+	};
+
+  var options = { new: true }; // newly updated record
+  var _amount = parseInt(req.query.tuition_amount)
+
+	Student.findOneAndUpdate(query, update, options, (err, student) =>{
+		if(err) {
+			console.error(err);
+    }
+		if(!student) {
+      return res.status(404).json({
+        error: true,
+        msg: 'Student not found'
+      });
+    }
+
+    if(_amount === 0) {
+      res.json(student);
+    } else {
+      const _transaction = {
+        src: 'Lighters',
+        dest: student.lastname ? `${student.lastname}${student.firstname}(${student.englishname})` : `${student.lastname}${student.firstname}`,
+        amount: _amount,
+        status: "OUT",
+        memo: "学生课程费用退款"
+      }
+  
+      Transaction.create(_transaction, (err, transaction) => {
+        if(err) {
+          console.error(err);
+          return res.status(404).json({
+            error: true,
+            msg: 'Fail to create transaction'
+          });
+        }
+        res.json(student);
+      });
+    }
+
+
 	});
 });
 

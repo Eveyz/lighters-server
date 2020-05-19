@@ -29,21 +29,26 @@ router.post('/createTeacher', utils.verifyAdmin, (req, res) => {
       status: "RESET_REQUIRED"
     }
     let teacher = data.teacher;
+    if(!teacher) console.err("teacher data not provided")
   
     User.create(user, (err, user) => {
-      if(err) console.log(err);
-      teacher.user_id = user.id;
-      // teacher.status = "RESET_REQUIRED";
-      teacher.status = "active";
-      teacher.systemid = teacherUsername;
-      teacher.temporary = teacherUsername;
-  
-      Teacher.create(teacher, function(err, teacher) {
-        if(err) {
-          console.error(err);
-        }
-        res.json(teacher.englishname);
-      })
+      if(err) {
+        console.log(err);
+        res.json({status: 200});
+      } else {
+        teacher.user_id = user.id;
+        // teacher.status = "RESET_REQUIRED";
+        teacher.status = "active";
+        teacher.systemid = teacherUsername;
+        teacher.temporary = teacherUsername;
+    
+        Teacher.create(teacher, function(err, teacher) {
+          if(err) {
+            console.error(err);
+          }
+          res.json(teacher.englishname);
+        })
+      }
   
     })
   });

@@ -190,11 +190,11 @@ router.put('/:_id', authenticate, (req, res) => {
   let query = {_id: req.params._id};
 	let update = {
 		'$set': _student
-	};
+  };
 
   var options = { new: true }; // newly updated record
 
-	Student.findOneAndUpdate(query, update, options, (err, student) =>{
+	Student.findOneAndUpdate(query, update, options, (err, student) => {
 		if(err) {
 			console.error(err);
     }
@@ -238,10 +238,10 @@ router.put('/:_id/deactivate', authenticate, (req, res) => {
     } else {
       const _transaction = {
         src: 'Lighters',
-        dest: student.lastname ? `${student.lastname}${student.firstname}(${student.englishname})` : `${student.lastname}${student.firstname}`,
+        dest: student.lastname ? `${student.lastname}${student.firstname}(${student.englishname})` : `${student.englishname}`,
         amount: _amount,
         status: "OUT",
-        memo: "学生课程费用退款"
+        memo: student.lastname ? `${student.lastname}${student.firstname}(${student.englishname})课程费用退款` : `${student.englishname}课程费用退款`
       }
   
       Transaction.create(_transaction, (err, transaction) => {

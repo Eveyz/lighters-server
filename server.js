@@ -78,14 +78,14 @@ if (process.env.NODE_ENV === "production") {
   console.log('Production mode');
   server.use(express.static(path.join(__dirname, '/build')));
   
-  // https.createServer(credentials, (req, res) => {
-    // res.writeHead(200);
-    // res.end('hello world\n');
-  // }).listen(8000);
-
   https.createServer(credentials, (req, res) => {
-    res.sendFile(path.join(__dirname, '/build/index.html'));
-  }).listen(PORT);
+    res.writeHead(200);
+    res.end('hello world\n');
+  }).listen(8000);
+
+  // https.createServer(credentials, (req, res) => {
+  //   res.sendFile(path.join(__dirname, '/build/index.html'));
+  // }).listen(PORT);
 
   // httpsServer.listen(PORT, (req, res) => {
   //   res.sendFile(path.join(__dirname, '/build/index.html'));

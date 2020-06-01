@@ -1,7 +1,6 @@
 require('dotenv').config();
 
 const fs = require('fs');
-const http = require('http');
 const https = require('https');
 const privateKey = fs.readFileSync(`${process.env.SSL_LOCATION}/3999874_www.lightersenglish.com.key`, 'utf8');
 const certificate = fs.readFileSync(`${process.env.SSL_LOCATION}/3999874_www.lightersenglish.com.pem`, 'utf8');
@@ -76,14 +75,8 @@ const PORT = process.env.PORT || config.port;
 
 if (process.env.NODE_ENV === "production") {
   server.use(express.static(path.join(__dirname, '/build')));
-  
-  // https.createServer(credentials, (req, res) => {
-  //   res.writeHead(200);
-  //   res.end('hello world\n');
-  // }).listen(8000);
 
   server.get('*', (req, res) => {
-    console.log(req)
     res.sendFile(path.join(__dirname, '/build/index.html'));
   });
 
@@ -91,19 +84,8 @@ if (process.env.NODE_ENV === "production") {
     console.log("Production server is on")
   });
 
-  // httpsServer.listen(PORT, () => {
-  //   console.log("Production server is on")
-  // });
-
-  // httpsServer.get('*', (req, res) => {
-  //   res.writeHead(200);
-  //   res.end('hello world\n');
-  // });
-
 } else {
-  const httpServer = http.createServer(server);
-  
-  httpServer.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.info('Express listenning on port ', PORT);
   });
 }

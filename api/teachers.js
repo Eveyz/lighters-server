@@ -6,6 +6,8 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 const Teacher = require('../models/teacher');
+const Report = require('../models/report');
+const _ = require("lodash")
 const authenticate = require('../middlewares/authenticate');
 
 /* Get Teachers */
@@ -36,6 +38,60 @@ router.get('/', authenticate, (req, res) => {
 		})
 	}
 });
+
+/* Get Teacher profile */
+router.get('/:_id/profile', (req, res) => {
+	var query = {_id: req.params._id};
+  
+  Teacher.findOne(query, (err, teacher) => {
+		if(err) console.error(err);
+		Report.find({"teacher_id": req.params._id}, (err, _reports) => {
+			if(err) {
+				res.json({
+					error: true,
+					msg: 'Reports not found'
+				})
+				console.log(err)
+			}
+			var reports = {}
+			_reports.forEach(r => {
+				let month = r["course_date"].substring(0, 7);
+				if(_.isEmpty(reports[month])) {
+					reports[month] = [r];
+				} else {
+					reports[month].push(r);
+				}
+			})
+			reports = Object.keys(reports).reduce((accumulator, currentValue) => {
+				accumulator[currentValue] = reports[currentValue];
+				return accumulator;
+			}, {})
+			res.json({
+				"teacher": teacher,
+				"reports": reports
+			});
+		}).populate('course_id', 'name')
+  }).populate('courses').populate({
+    path: 'courses',
+    model: 'Course',
+    populate: {
+      path: 'books',
+			model: 'Book',
+			populate: {
+				path: 'keywords',
+				model: 'Keyword'
+			}
+    }
+  }).populate({
+    path: 'courses',
+    model: 'Course',
+    populate: {
+      path: 'students',
+      model: 'Student'
+    }
+  }).populate('students');
+});
+
 
 /* Get Teacher by id */
 router.get('/:_id', (req, res) => {

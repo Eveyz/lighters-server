@@ -84,12 +84,14 @@ router.post('/authenticate', (req, res) => {
                   if(!teacher) {
                     return res.status(301).json({
                       token: token,
-                      teacher: ""
+                      teacher: {},
+                      student: {}
                     });
                   }
                   res.json({
                     token: token,
-                    teacher: teacher
+                    teacher: teacher,
+                    student: {}
                   });
                 }).populate('courses').populate({
                   path: 'courses',
@@ -117,12 +119,14 @@ router.post('/authenticate', (req, res) => {
                   if(!student) {
                     return res.status(301).json({
                       token: token,
-                      student: ""
+                      student: {},
+                      teacher: {}
                     });
                   }
     
                   res.json({
                     token: token,
+                    teacher: {},
                     student: student
                   });
                 }).populate('courses').populate({

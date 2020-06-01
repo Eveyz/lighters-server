@@ -3,8 +3,8 @@ require('dotenv').config();
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-const privateKey = fs.readFileSync(`${process.env.SSL_LOCATION}/3999874_www.lightersenglish.com.key`, 'utf8');
-const certificate = fs.readFileSync(`${process.env.SSL_LOCATION}/3999874_www.lightersenglish.com.pem`, 'utf8');
+const privateKey = fs.readFileSync(`${process.env.UBUNTU_SSL_LOCATION}/3999874_www.lightersenglish.com.key`, 'utf8');
+const certificate = fs.readFileSync(`${process.env.UBUNTU_SSL_LOCATION}/3999874_www.lightersenglish.com.pem`, 'utf8');
 const credentials = {key: privateKey, cert: certificate};
 
 const express = require("express");
@@ -75,7 +75,6 @@ var db = config.db;
 const PORT = process.env.PORT || config.port;
 
 if (process.env.NODE_ENV === "production") {
-  console.log('Production mode');
   server.use(express.static(path.join(__dirname, '/build')));
   
   // https.createServer(credentials, (req, res) => {
@@ -83,7 +82,8 @@ if (process.env.NODE_ENV === "production") {
   //   res.end('hello world\n');
   // }).listen(8000);
 
-  server.listen('*', (req, res) => {
+  server.get('*', (req, res) => {
+    console.log(req)
     res.sendFile(path.join(__dirname, '/build/index.html'));
   });
 

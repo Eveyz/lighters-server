@@ -70,7 +70,7 @@ function getStudyID(number) {
       res = sum.toString();
       break;
     default:
-      res = "010";
+      res = `${sum}`;
       break;
   }
   return res;

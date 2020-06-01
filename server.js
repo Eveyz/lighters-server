@@ -1,3 +1,12 @@
+require('dotenv').config();
+
+const fs = require('fs');
+const http = require('http');
+const https = require('https');
+const privateKey = fs.readFileSync(`${process.env.SSL_LOCATION}/3999874_www.lightersenglish.com.key`, 'utf8');
+const certificate = fs.readFileSync(`${process.env.SSL_LOCATION}/3999874_www.lightersenglish.com.pem`, 'utf8');
+const credentials = {key: privateKey, cert: certificate};
+
 const express = require("express");
 const bodyParser = require('body-parser');
 const logger = require('morgan');
@@ -24,7 +33,6 @@ const tuitionsAPI = require("./api/tuition");
 const teacherRatesAPI = require("./api/teacher_rates");
 
 const server = express();
-require('dotenv').config();
 
 // Express Middleware
 server.use(logger('dev'));
@@ -64,20 +72,31 @@ server.use('/teacher_rates', teacherRatesAPI);
  * @author: znz
 */
 var db = config.db;
+const PORT = process.env.PORT || config.port;
 
 if (process.env.NODE_ENV === "production") {
   console.log('Production mode');
   server.use(express.static(path.join(__dirname, '/build')));
+  
+  // https.createServer(credentials, (req, res) => {
+    // res.writeHead(200);
+    // res.end('hello world\n');
+  // }).listen(8000);
 
-  server.get('*', (req, res) => {
+  https.createServer(credentials, (req, res) => {
     res.sendFile(path.join(__dirname, '/build/index.html'));
+  }).listen(PORT);
+
+  // httpsServer.listen(PORT, (req, res) => {
+  //   res.sendFile(path.join(__dirname, '/build/index.html'));
+  // });
+} else {
+  const httpServer = http.createServer(server);
+  
+  httpServer.listen(PORT, () => {
+    console.info('Express listenning on port ', PORT);
   });
 }
 
-const PORT = process.env.PORT || config.port;
-
-server.listen(PORT, () => {
-  console.info('Express listenning on port ', PORT);
-});
 
 module.exports = server

@@ -53,6 +53,7 @@ router.get('/:_id/profile', (req, res) => {
 				})
 				console.log(err)
 			}
+			_reports = _.orderBy(_reports, ['course_date'],['desc'])
 			var reports = {}
 			_reports.forEach(r => {
 				let month = r["course_date"].substring(0, 7);
@@ -62,10 +63,6 @@ router.get('/:_id/profile', (req, res) => {
 					reports[month].push(r);
 				}
 			})
-			reports = Object.keys(reports).reduce((accumulator, currentValue) => {
-				accumulator[currentValue] = reports[currentValue];
-				return accumulator;
-			}, {})
 			res.json({
 				"teacher": teacher,
 				"reports": reports

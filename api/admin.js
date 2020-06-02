@@ -18,7 +18,7 @@ router.post('/createTeacher', utils.verifyAdmin, (req, res) => {
 
     let systemID = utils.getStudyID(count);
     let teacherUsername = `T${(new Date()).getFullYear().toString().substr(-2)}${systemID}`;
-    const user = {
+    const user_data = {
       identity: "teacher",
       username: teacherUsername,
       email: `${teacherUsername}@lighters.com`,
@@ -30,12 +30,16 @@ router.post('/createTeacher', utils.verifyAdmin, (req, res) => {
     }
     let teacher = data.teacher;
     if(!teacher) console.err("teacher data not provided")
-  
-    User.create(user, (err, user) => {
+
+    User.findOne({ email: `${teacherUsername}@lighters.com`}, (err, user) => {
       if(err) {
-        console.log(err);
-        res.json({status: 200});
-      } else {
+        console.log(err)
+        res.json({
+          error: true,
+          msg: "failed to find user"
+        })
+      }
+      if(user) {
         teacher.user_id = user.id;
         // teacher.status = "RESET_REQUIRED";
         teacher.status = "active";
@@ -48,8 +52,29 @@ router.post('/createTeacher', utils.verifyAdmin, (req, res) => {
           }
           res.json(teacher.englishname);
         })
+      } else {
+        User.create(user_data, (err, user) => {
+          if(err) {
+            console.log(err);
+            res.json({status: 200});
+          } else {
+            teacher.user_id = user.id;
+            // teacher.status = "RESET_REQUIRED";
+            teacher.status = "active";
+            teacher.systemid = teacherUsername;
+            teacher.temporary = teacherUsername;
+        
+            Teacher.create(teacher, function(err, teacher) {
+              if(err) {
+                console.error(err);
+              }
+              res.json(teacher.englishname);
+            })
+          }
+      
+        })
+
       }
-  
     })
   });
 });
@@ -62,7 +87,7 @@ router.post('/createStudent', utils.verifyAdmin, (req, res) => {
     
     let systemID = utils.getStudyID(count);
     let studentUsername = `S${(new Date()).getFullYear().toString().substr(-2)}${systemID}`;
-    const user = {
+    const user_data = {
       identity: "student",
       email: `${studentUsername}@lighters.com`,
       username: studentUsername,
@@ -73,23 +98,48 @@ router.post('/createStudent', utils.verifyAdmin, (req, res) => {
       status: "RESET_REQUIRED"
     }
     let student = data.student;
-  
-    User.create(user, (err, user) => {
-      if(err) console.log(err);
-      student.user_id = user.id;
-      // student.status = "RESET_REQUIRED";
-      student.status = "active";
-      student.systemid = studentUsername;
-      student.temporary = studentUsername;
-  
-      Student.create(student, function(err, student) {
-        if(err) {
-          console.error(err);
-        }
-        res.json(student.englishname);
-      })
-  
+
+    User.findOne({ email: `${studentUsername}@lighters.com`}, (err, user) => {
+      if(err) {
+        console.log(err)
+        res.json({
+          error: true,
+          msg: "failed to find user"
+        })
+      }
+      if(user) {
+        student.user_id = user.id;
+        // student.status = "RESET_REQUIRED";
+        student.status = "active";
+        student.systemid = studentUsername;
+        student.temporary = studentUsername;
+    
+        Student.create(student, function(err, student) {
+          if(err) {
+            console.error(err);
+          }
+          res.json(student.englishname);
+        })
+      } else {
+        User.create(user_data, (err, user) => {
+          if(err) console.log(err);
+          student.user_id = user.id;
+          // student.status = "RESET_REQUIRED";
+          student.status = "active";
+          student.systemid = studentUsername;
+          student.temporary = studentUsername;
+      
+          Student.create(student, function(err, student) {
+            if(err) {
+              console.error(err);
+            }
+            res.json(student.englishname);
+          })
+      
+        })
+      }
     })
+  
   })
 });
 

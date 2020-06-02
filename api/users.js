@@ -49,8 +49,8 @@ router.post('/authenticate', (req, res) => {
     User.findOne({ username: req.body.username }, async function(err, user) {
       if(err) console.error(err);
       if(!user) {
-        return res.status(404).json({
-          error: true,
+        return res.status(200).json({
+          success: true,
           status: 'error',
           msg: '用户不存在'
         });
@@ -67,7 +67,7 @@ router.post('/authenticate', (req, res) => {
           if(err) console.error(err);
           console.log('Password:', isMatch);
           if(!isMatch) {
-            return res.status(404).json({
+            return res.status(200).json({
               success: false,
               status: 'error',
               msg: '密码错误'
@@ -82,7 +82,7 @@ router.post('/authenticate', (req, res) => {
                   if(err) console.error(err);
     
                   if(!teacher) {
-                    return res.status(301).json({
+                    return res.status(200).json({
                       token: token,
                       teacher: null,
                       student: null
@@ -117,7 +117,7 @@ router.post('/authenticate', (req, res) => {
                   if(err) console.error(err);
     
                   if(!student) {
-                    return res.status(301).json({
+                    return res.status(200).json({
                       token: token,
                       student: null,
                       teacher: null
@@ -162,8 +162,8 @@ router.post('/authenticate', (req, res) => {
       }
     });
   } else {
-    res.status(400).json({
-      error: true,
+    res.status(200).json({
+      success: true,
       status: 'error',
       msg: '邮箱或密码不能为空'
     });

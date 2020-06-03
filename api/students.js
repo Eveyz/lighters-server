@@ -3,7 +3,7 @@
 */
 
 const express = require('express');
-const path = require('path');
+const _ = require('lodash');
 const router = express.Router();
 const Student = require('../models/student');
 const Report = require('../models/report');
@@ -48,20 +48,9 @@ router.get('/:_id', (req, res) => {
 	Student.findOne(query, async (err, student) => {
     if(err) console.error(err);
 
-    var all_promises = []
-    var courses = []
-    student.courses.forEach((course) => {
-      all_promises.push(
-        new Promise(async (resolve, reject) => {
-          const _reports = await Report.find({course_id: course._id, student_id: student._id}).populate('teacher_id', 'lastname firstname englishname')
-          course.reports = _reports
-          resolve(_reports)
-          courses.push(course)
-        })
-      )
-    })
-    await Promise.all(all_promises)
-    student.courses = courses
+    var _reports = await Report.find({student_id: student._id}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name course_rate');
+    _reports = _.sortBy(_reports, ['course_date'], ['desc'])
+    student._doc.reports = _reports
 
     const _tuitions = await Tuition.find({student_id: student._id})
     student._doc.tuitions = _tuitions
@@ -106,20 +95,27 @@ router.post('/:_id/recalculate', (req, res) => {
 			console.error(err);
     }
 
-    var all_promises = []
-    var courses = []
-    student.courses.forEach((course) => {
-      all_promises.push(
-        new Promise(async (resolve, reject) => {
-          const _reports = await Report.find({course_id: course._id, student_id: student._id}).populate('teacher_id', 'lastname firstname englishname')
-          course.reports = _reports
-          resolve(_reports)
-          courses.push(course)
-        })
-      )
-    })
-    await Promise.all(all_promises)
-    student.courses = courses
+    // var all_promises = []
+    // var courses = []
+    // student.courses.forEach((course) => {
+    //   all_promises.push(
+    //     new Promise(async (resolve, reject) => {
+    //       const _reports = await Report.find({course_id: course._id, student_id: student._id}).populate('teacher_id', 'lastname firstname englishname')
+    //       course.reports = _reports
+    //       resolve(_reports)
+    //       courses.push(course)
+    //     })
+    //   )
+    // })
+    // await Promise.all(all_promises)
+    // student.courses = courses
+
+    // const _tuitions = await Tuition.find({student_id: student._id})
+    // student._doc.tuitions = _tuitions
+
+    var _reports = await Report.find({student_id: student._id}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name course_rate');
+    _reports = _.sortBy(_reports, ['course_date'], ['desc'])
+    student._doc.reports = _reports
 
     const _tuitions = await Tuition.find({student_id: student._id})
     student._doc.tuitions = _tuitions
@@ -156,7 +152,7 @@ router.get('/:_id/reports', (req, res) => {
 		if(err) throw(err);
 
 		res.json(reports);
-	}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name');
+	}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name course_rate');
 });
 
 /* Create Student */

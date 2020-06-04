@@ -38,7 +38,7 @@ server.use(logger('dev'));
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: false }));
 server.use(cookieParser());
-// server.use('/public', express.static(__dirname + '/public'));
+server.use('/public', express.static(__dirname + '/public'));
 
 /* API 
  * @author: znz

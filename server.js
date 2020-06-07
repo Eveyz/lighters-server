@@ -84,7 +84,7 @@ const gracefulShutdown = () => {
 };
 
 if (process.env.NODE_ENV === "production") {
-  app.use(logger('combined'));
+  server.use(logger('combined'));
   server.use(express.static(path.join(__dirname, '/build')));
 
   server.get('*', (req, res) => {

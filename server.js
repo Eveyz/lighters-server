@@ -7,11 +7,11 @@ const certificate = fs.readFileSync(`${process.env.SSL_LOCATION}/3999874_www.lig
 const credentials = {key: privateKey, cert: certificate};
 
 const express = require("express");
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const path = require('path');
-const MongoClient = require("mongodb").MongoClient;
 
 const config = require("./config");
 
@@ -32,6 +32,7 @@ const tuitionsAPI = require("./api/tuition");
 const teacherRatesAPI = require("./api/teacher_rates");
 
 const server = express();
+server.set('trust proxy', true);
 
 // Express Middleware
 server.use(logger('dev'));
@@ -73,7 +74,17 @@ server.use('/teacher_rates', teacherRatesAPI);
 var db = config.db;
 const PORT = process.env.PORT || config.port;
 
+const gracefulShutdown = () => {
+  mongoose.connection.close(false, () => {
+    console.log('Mongo closed');
+    server.close(() => {
+      console.log('Shutting down...');
+    });
+  });
+};
+
 if (process.env.NODE_ENV === "production") {
+  app.use(logger('combined'));
   server.use(express.static(path.join(__dirname, '/build')));
 
   server.get('*', (req, res) => {
@@ -82,11 +93,21 @@ if (process.env.NODE_ENV === "production") {
 
   https.createServer(credentials, server).listen(PORT, () => {
     console.log("Production server is on")
+    // Handle kill commands
+    process.on('SIGTERM', gracefulShutdown);
+
+    // Prevent dirty exit on code-fault crashes:
+    process.on('uncaughtException', gracefulShutdown);
   });
 
 } else {
   server.listen(PORT, () => {
     console.info('Express listenning on port ', PORT);
+    // Handle kill commands
+    process.on('SIGTERM', gracefulShutdown);
+
+    // Prevent dirty exit on code-fault crashes:
+    process.on('uncaughtException', gracefulShutdown);
   });
 }
 

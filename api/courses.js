@@ -142,22 +142,24 @@ router.put('/:_id', utils.verifyAdmin, (req, res) => {
   };
   
   // remove course from previous course
-  Course.findOne(query, (err, course) => {
-		if(err) {
-			console.error(err);
-    }
-    course.teachers.forEach((t) => {
-      Teacher.findOne({_id: t._id}, (err, teacher) => {
-        if(err) {
-          console.error(err);
-        }
-        if(teacher) {
-          teacher.courses.pull(course._id)
-          teacher.save()
-        }
+  if(_course.teachers && _course.teachers.length > 0) {
+    Course.findOne(query, (err, course) => {
+      if(err) {
+        console.error(err);
+      }
+      course.teachers.forEach((t) => {
+        Teacher.findOne({_id: t._id}, (err, teacher) => {
+          if(err) {
+            console.error(err);
+          }
+          if(teacher) {
+            teacher.courses.pull(course._id)
+            teacher.save()
+          }
+        })
       })
     })
-  })
+  }
 
 	var options = { new: true }; // newly updated record
 

@@ -83,12 +83,14 @@ router.post('/authenticate', (req, res) => {
     
                   if(!teacher) {
                     return res.status(200).json({
+                      success: true,
                       token: token,
                       teacher: null,
                       student: null
                     });
                   }
                   res.json({
+                    success: true,
                     token: token,
                     teacher: teacher,
                     student: null
@@ -118,6 +120,7 @@ router.post('/authenticate', (req, res) => {
     
                   if(!student) {
                     return res.status(200).json({
+                      success: true,
                       token: token,
                       student: null,
                       teacher: null
@@ -125,6 +128,7 @@ router.post('/authenticate', (req, res) => {
                   }
     
                   res.json({
+                    success: true,
                     token: token,
                     teacher: null,
                     student: student
@@ -150,6 +154,7 @@ router.post('/authenticate', (req, res) => {
                 }).populate('teachers');
               } else {
                 res.json({
+                  success: true,
                   token: token,
                   student: null,
                   teacher: null

@@ -50,7 +50,7 @@ router.post('/authenticate', (req, res) => {
       if(err) console.error(err);
       if(!user) {
         return res.status(200).json({
-          success: true,
+          success: false,
           status: 'error',
           msg: '用户不存在'
         });
@@ -168,7 +168,7 @@ router.post('/authenticate', (req, res) => {
     });
   } else {
     res.status(200).json({
-      success: true,
+      success: false,
       status: 'error',
       msg: '邮箱或密码不能为空'
     });

@@ -38,7 +38,7 @@ router.get('/profit', async (req, res) => {
   }
   if(transactions.length > 0) {
     transactions.forEach((transaction, idx) => {
-      if(transaction.status === "OUT") sum -= transaction.amount
+      if(transaction.status === "OUT" && !transaction.memo.includes("退")) sum -= transaction.amount
       else if(transaction.status === "IN" && transaction.memo.includes("初始")) {
         sum += transaction.amount
       }

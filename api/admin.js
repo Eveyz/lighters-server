@@ -7,8 +7,51 @@ const router = express.Router();
 const User = require('../models/user');
 const Teacher = require('../models/teacher');
 const Student = require('../models/student');
+const Report = require('../models/report');
+const Compensation = require('../models/compensation');
+const Transaction = require('../models/transaction');
 const utils = require('../utils');
 const authenticate = require('../middlewares/authenticate');
+
+// check reports profit and compensations
+router.get('/profit', async (req, res) => {
+	let { skip, limit, ...query } = req.query
+	skip = parseInt(skip)
+	limit = parseInt(limit)
+	let reports = await Report.find({}).sort({created_at: -1}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name course_rate').populate('student_id', 'lastname firstname englishname').exec()
+  let compensations = await Compensation.find({}).exec()
+  let transactions = await Transaction.find({}).exec()
+  let sum = 0
+	if(reports.length > 0) {
+    reports.forEach((report, idx) => {
+      const report_credit = utils.getStudentReportCredit(report.situation)
+      if(report_credit > 0) {
+        sum += (report.course_id.course_rate * report_credit - report.amount)
+      }
+    })
+  }
+  if(compensations.length > 0) {
+    compensations.forEach((compensation, idx) => {
+      if(compensation.type === "罚款") sum += compensation.amount
+      else sum -= compensation.amount
+    })
+  }
+  if(transactions.length > 0) {
+    transactions.forEach((transaction, idx) => {
+      if(transaction.status === "OUT") sum -= transaction.amount
+      else if(transaction.status === "IN" && transaction.memo.includes("初始")) {
+        sum += transaction.amount
+      }
+    })
+  }
+	res.json({
+		'profit': sum,
+		'reports_length': reports.length,
+		'reports': reports.slice(skip * limit, skip * limit + limit),
+		'compensations_length': compensations.length,
+		'compensations': compensations.slice(skip * limit, skip * limit + limit)
+	})
+});
 
 /* Create Teacher */
 router.post('/createTeacher', utils.verifyAdmin, (req, res) => {

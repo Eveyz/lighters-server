@@ -42,6 +42,7 @@ var reportSchema = new mongoose.Schema({
   paid: { type: Boolean, default: false },
   credit: { type: Number, default: 1 },
   teacher_rate: { type: Number, default: 0 },
+  course_rate: { type: Number, default: 0 },
   status: { type: String, default: "active" },
   amount: { type: Number, default: 0 },   // 每个反馈表 老师得到的钱
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

@@ -10,12 +10,22 @@ const authenticate = require('../middlewares/authenticate');
 
 /* Get Compensations */
 router.get('/', authenticate, (req, res) => {
-	Compensation.find(req.query, (err, compensations) => {
-		if(err) {
-			console.error(err);
-		}
-		res.json(compensations);
-	});
+	let { skip, limit, ...query } = req.query
+	if(skip || limit) {
+		Compensation.find(query, (err, compensations) => {
+			if(err) {
+				console.error(err);
+			}
+			res.json(compensations);
+		}).skip(parseInt(skip) * parseInt(limit)).limit(parseInt(limit));
+	} else {
+		Compensation.find(query, (err, compensations) => {
+			if(err) {
+				console.error(err);
+			}
+			res.json(compensations);
+		});
+	}
 });
 
 /* Get Compensation by id */

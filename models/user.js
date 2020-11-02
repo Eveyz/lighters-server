@@ -1,7 +1,7 @@
 /* 
  * @author: znz
  * 
- * user status => RESET_REQUIRED -> UNVERIFIED -> VERIFIED
+ * user status => RESET_REQUIRED -> ACTIVE -> INACTIVE
 */
 
 let mongoose = require('mongoose');

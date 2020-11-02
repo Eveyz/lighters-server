@@ -26,14 +26,26 @@ var upload = multer({storage: storage}).array('audios', 10);
 
 /* Get Reports */
 router.get('/', authenticate, (req, res) => {
-	Report.find(req.query, (err, reports) => {
-		if(err) {
-			console.error(err);
-		}
-		res.json(reports.sort((a, b) => {
-      return a.course_date > b.course_date ? -1 : (a.course_date < b.course_date ? 1 : 0)
-    }));
-	}).sort({created_at: -1}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name course_rate').populate('student_id', 'lastname firstname englishname')
+  let { skip, limit, ...query } = req.query
+	if(skip || limit) {
+    Report.find(query, (err, reports) => {
+      if(err) {
+        console.error(err);
+      }
+      res.json(reports.sort((a, b) => {
+        return a.course_date > b.course_date ? -1 : (a.course_date < b.course_date ? 1 : 0)
+      }));
+    }).skip(parseInt(skip) * parseInt(limit)).limit(parseInt(limit)).sort({created_at: -1}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name course_rate').populate('student_id', 'lastname firstname englishname')
+	} else {
+    Report.find(query, (err, reports) => {
+      if(err) {
+        console.error(err);
+      }
+      res.json(reports.sort((a, b) => {
+        return a.course_date > b.course_date ? -1 : (a.course_date < b.course_date ? 1 : 0)
+      }));
+    }).sort({created_at: -1}).populate('teacher_id', 'lastname firstname englishname').populate('course_id', 'name course_rate').populate('student_id', 'lastname firstname englishname')
+	}
 });
 
 /* Copy Report */

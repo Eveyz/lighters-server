@@ -35,7 +35,25 @@ router.get('/all', async (req, res) => {
 	skip = parseInt(skip)
 	limit = parseInt(limit)
 	let ts = await Transaction.find(query).exec()
-	let paychecks = await Paycheck.find({"paid": true}).exec()
+	let paychecks = await Paycheck.find({"paid": true}).populate({
+    path: 'reports',
+    model: 'Report',
+    select: 'course_date credit teacher_rate amount situation teacher_id',
+    populate: {
+      path: 'course_id',
+      model: 'Course',
+      select: 'name course_rate type'
+    }
+  }).populate({
+    path: 'reports',
+    model: 'Report',
+    select: 'course_date credit teacher_rate amount situation teacher_id',
+    populate: {
+      path: 'student_id',
+      model: 'Student',
+      select: 'firstname lastname englishname'
+    }
+  }).populate('compensations', 'type amount memo').populate('teacher_id', 'firstname lastname level').exec()
 	paychecks.forEach((pc, idx) => {
 		if(pc.amount !== 0) {
 			ts.push({

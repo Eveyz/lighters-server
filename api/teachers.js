@@ -7,6 +7,7 @@ const path = require('path');
 const router = express.Router();
 const Teacher = require('../models/teacher');
 const Report = require('../models/report');
+const TeacherLevel = require('../models/teacher_level');
 const _ = require("lodash")
 const authenticate = require('../middlewares/authenticate');
 
@@ -45,13 +46,13 @@ router.get('/:_id/profile', (req, res) => {
   
   Teacher.findOne(query, (err, teacher) => {
 		if(err) console.error(err);
-		Report.find({"teacher_id": req.params._id}, (err, _reports) => {
-			if(err) {
+		Report.find({"teacher_id": req.params._id}, (e, _reports) => {
+			if(e) {
 				res.json({
 					error: true,
 					msg: 'Reports not found'
 				})
-				console.log(err)
+				console.log(e)
 			}
 			_reports = _.orderBy(_reports, ['course_date'],['desc'])
 			var reports = {}
@@ -63,10 +64,20 @@ router.get('/:_id/profile', (req, res) => {
 					reports[month].push(r);
 				}
 			})
-			res.json({
-				"teacher": teacher,
-				"reports": reports
-			});
+			TeacherLevel.find({"teacher_id": req.params._id}, (er, ts) => {
+				if(er) {
+					res.json({
+						error: true,
+						msg: 'teacher level not found'
+					})
+					console.log(er)
+				}
+				res.json({
+					"teacher": teacher,
+					"reports": reports,
+					"teacher_level": ts.length > 0 ? ts[ts.length - 1] : null
+				});
+			})
 		}).populate('course_id', 'name')
   }).populate('courses').populate({
     path: 'courses',
@@ -138,7 +149,13 @@ router.put('/:_id', authenticate, (req, res) => {
 		'$set': _teacher
 	};
 
-  var options = { new: true }; // newly updated record
+	var options = { new: true }; // newly updated record
+	
+	let _level = null
+	Teacher.findOne(query, (err, teacher) => {
+    if(err) console.error(err);
+    _level = teacher.level
+  })
 
 	Teacher.findOneAndUpdate(query, update, options, (err, teacher) =>{
 		if(err) {
@@ -148,8 +165,25 @@ router.put('/:_id', authenticate, (req, res) => {
       return res.status(404).json({
         error: true,
         msg: 'Teacher not found'
-      });
-    }
+      })
+		}
+		// record teacher level
+		if('level' in _teacher) {
+			TeacherLevel.create({
+				"firstname": teacher.firstname,
+				"lastname": teacher.lastname,
+				"englishname": teacher.englishname,
+				"level": _teacher['level'],
+				"old_level": _level,
+				"teacher_id": teacher._id,
+				"status": _teacher['level'] > _level ? "UP" : "DOWN"
+			}, function(e, tl) {
+				if(e) {
+					console.error(e)
+				}
+			})
+		}
+
     res.json(teacher);
 	});
 });

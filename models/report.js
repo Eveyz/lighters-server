@@ -41,10 +41,10 @@ var reportSchema = new mongoose.Schema({
   audios_files: [],
   paid: { type: Boolean, default: false },
   credit: { type: Number, default: 1 },
-  teacher_rate: { type: Number, default: 0 },
+  teacher_rate: { type: Number, default: 0 },   // 老师工资
   course_rate: { type: Number, default: 0 },
   status: { type: String, default: "active" },
-  amount: { type: Number, default: 0 },   // 每个反馈表 老师得到的钱
+  amount: { type: Number, default: 0 },   // 每个反馈表 老师实际得到的钱
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   created_at: Date,
   updated_at: Date
@@ -184,6 +184,7 @@ reportSchema.methods.calculate = async function() {
   let reportPrice = 0
   const teacher = await Teacher.findOne({_id: this.teacher_id})
   const course = await Course.findOne({_id: this.course_id})
+  // 先查看老师有没有特别设定的工资
   const _teacher_rates = await TeacherRate.find({teacher_id: this.teacher_id})
   if(_teacher_rates.length > 0) {
     _teacher_rates.forEach(tr => {
@@ -196,6 +197,7 @@ reportSchema.methods.calculate = async function() {
       }
     })
   }
+  // 没有找到个人特别设定的工资，则按照标准的工资来计算钱
   // not specified rates found, refer to the standard rates
   if(reportPrice === 0) {
     if(teacher && course) {
@@ -205,7 +207,7 @@ reportSchema.methods.calculate = async function() {
     this.teacher_rate = reportPrice // => update report teacher rate
     console.log("reportPrice: ", reportPrice)
   }
-
+  // 最后计算这个反馈表要付的钱: 老师的工资 * 反馈表的实际应付比例
   // return final amount
   this.amount = (reportPrice * reportCredit).toFixed(2)
 };

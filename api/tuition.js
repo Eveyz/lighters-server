@@ -18,7 +18,9 @@ router.get('/', authenticate, (req, res) => {
 		if(err) {
 			console.error(err);
 		}
-		res.json(tuitions);
+		res.json(tuitions.sort((a, b) => {
+      return a.created_at > b.created_at ? -1 : (a.created_at < b.created_at ? 1 : 0)
+    }));
 	}).populate('student_id', 'englishname firstname lastname');
 });
 

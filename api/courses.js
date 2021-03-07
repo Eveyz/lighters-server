@@ -127,13 +127,13 @@ router.put('/:_id', utils.verifyAdmin, (req, res) => {
   let _course = req.body;
 
   // update teacher for course
-  if(_course.teachers && _course.teachers.length > 0) {
-    let mongoose_ids = [];
-    _course.teachers.forEach(id => {
-      mongoose_ids.push(mongoose.Types.ObjectId(id));
-    });
-    _course.teachers = mongoose_ids;
-  }
+  // if(_course.teachers && _course.teachers.length > 0) {
+  //   let mongoose_ids = [];
+  //   _course.teachers.forEach(id => {
+  //     mongoose_ids.push(mongoose.Types.ObjectId(id));
+  //   });
+  //   _course.teachers = mongoose_ids;
+  // }
 
   let query = {_id: req.params._id};
 	// if the field doesn't exist $set will set a new field
@@ -168,22 +168,30 @@ router.put('/:_id', utils.verifyAdmin, (req, res) => {
 			console.error(err);
     }
 
-    course.populate('books').populate('teachers', 'lastname firstname englishname').populate('students', function(err, c) {
+    course.populate('books').populate('teachers', 'lastname firstname englishname').populate('students', async function(err, c) {
       if(err) {
         console.error(err);
       }
 
       if(_course.teachers) {
-        // append course into assign teacher
+        // append course into assigned teacher
+        var all_promises = []
         _course.teachers.forEach(id => {
-          Teacher.findOneAndUpdate(
-            {_id: id}, 
-            {'$addToSet': { 'courses': c.id } }, 
-            options, 
-            (err, teacher) => {
-            if(err) console.error(err);
+          new Promise(async (resolve, reject) => {
+            let teacher = await Teacher.findOneAndUpdate({_id: id}, {'$addToSet': { 'courses': c.id } }, options)
+            resolve(teacher)
           })
-        });
+        })
+        await Promise.all(all_promises)
+        // _course.teachers.forEach(id => {
+        //   Teacher.findOneAndUpdate(
+        //     {_id: id}, 
+        //     {'$addToSet': { 'courses': c.id } }, 
+        //     options, 
+        //     (err, teacher) => {
+        //     if(err) console.error(err);
+        //   })
+        // })
       }
 
       res.json(c);

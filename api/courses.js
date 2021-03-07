@@ -141,7 +141,7 @@ router.put('/:_id', utils.verifyAdmin, (req, res) => {
 		'$set': _course
   };
   
-  // remove course from previous course
+  // remove course from previous teachers
   if(_course.teachers && _course.teachers.length > 0) {
     Course.findOne(query, (err, course) => {
       if(err) {
@@ -175,7 +175,7 @@ router.put('/:_id', utils.verifyAdmin, (req, res) => {
 
       if(_course.teachers) {
         // append course into assign teacher
-        c.teachers.forEach(id => {
+        _course.teachers.forEach(id => {
           Teacher.findOneAndUpdate(
             {_id: id}, 
             {'$addToSet': { 'courses': c.id } }, 

@@ -2,8 +2,8 @@ require('dotenv').config();
 
 const fs = require('fs');
 const https = require('https');
-const privateKey = fs.readFileSync(`${process.env.SSL_LOCATION}/3999874_www.lightersenglish.com.key`, 'utf8');
-const certificate = fs.readFileSync(`${process.env.SSL_LOCATION}/3999874_www.lightersenglish.com.pem`, 'utf8');
+const privateKey = fs.readFileSync(`${process.env.SSL_LOCATION}/${process.env.SSL_KEY}`, 'utf8');
+const certificate = fs.readFileSync(`${process.env.SSL_LOCATION}/${process.env.SSL_PEM}`, 'utf8');
 const credentials = {key: privateKey, cert: certificate};
 
 const express = require("express");

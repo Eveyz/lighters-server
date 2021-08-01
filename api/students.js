@@ -9,6 +9,7 @@ const Student = require('../models/student');
 const Report = require('../models/report');
 const Tuition = require('../models/tuition');
 const Transaction = require('../models/transaction');
+const Evaluation = require('../models/evaluation');
 const mongoose = require('mongoose');
 const authenticate = require('../middlewares/authenticate');
 
@@ -42,7 +43,7 @@ router.get('/low_balance', authenticate, (req, res) => {
 });
 
 /* Get Student by id */
-router.get('/:_id', (req, res) => {
+router.get('/:_id', authenticate, (req, res) => {
 	let query = {_id: req.params._id};
 
 	Student.findOne(query, async (err, student) => {
@@ -54,6 +55,9 @@ router.get('/:_id', (req, res) => {
 
     const _tuitions = await Tuition.find({student_id: student._id})
     student._doc.tuitions = _tuitions
+
+    const _evaluations = await Evaluation.find({student_id: student._id})
+    student._doc.evaluations = _evaluations
 
     res.json(student);
 

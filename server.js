@@ -31,6 +31,7 @@ const transactionsAPI = require("./api/transaction");
 const tuitionsAPI = require("./api/tuition");
 const teacherRatesAPI = require("./api/teacher_rates");
 const teacherLevelAPI = require("./api/teacher_level");
+const evaluationsAPI = require("./api/evaluations");
 
 const server = express();
 server.set('trust proxy', true);
@@ -61,6 +62,7 @@ server.use('/transactions', transactionsAPI);
 server.use('/tuitions', tuitionsAPI);
 server.use('/teacher_rates', teacherRatesAPI);
 server.use('/teacher_levels', teacherLevelAPI);
+server.use('/evaluations', evaluationsAPI);
 
 // server.use((req, res) => {
 //   res.status(404).json({error: "not found"})

@@ -12,6 +12,7 @@ const Course = require('../models/course');
 const Teacher = require('../models/teacher');
 const Student = require('../models/student');
 const Paycheck = require('../models/paycheck');
+const Notification = require('../models/notification');
 const Audit = require('../models/audit');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
@@ -259,20 +260,29 @@ router.get('/from/token', utils.verifyToken, (req, res) => {
 });
 
 router.get('/admin/init', utils.verifyAdmin, async (req, res) => {
-  var _books, _courses, _students, _teachers, _paychecks;
+  var _books, _courses, _students, _teachers, _paychecks, _notifications;
 
   _books = await Book.estimatedDocumentCount({})
   _courses = await Course.estimatedDocumentCount({})
   _students = await Student.estimatedDocumentCount({})
-  _teachers = await Teacher.estimatedDocumentCount({})
+  _teachers = await Teacher.find({})
   _paychecks = await Paycheck.find({"paid": false})
+
+  let cnt = 0
+  for(let i = 0; i < _teachers.length; i++) {
+    if(_teachers[i].status === "active") {
+      _notifications = await Notification.find({teacher_id: _teachers[i]._id, "read": false})
+      cnt = cnt + _notifications.length
+    }
+  }
 
   res.json({
     books: _books,
     courses: _courses,
     students: _students,
-    teachers: _teachers,
-    paychecks: _paychecks.length
+    teachers: _teachers.length,
+    paychecks: _paychecks.length,
+    notifications: cnt
   })
 });
 

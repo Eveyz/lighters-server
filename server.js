@@ -15,7 +15,7 @@ const path = require('path');
 const schedule = require('node-schedule');
 
 const config = require("./config");
-const utils = require('./utils')
+const helper = require('./helper')
 
 const adminAPI = require("./api/admin");
 const usersAPI = require("./api/users");
@@ -79,10 +79,10 @@ server.use('/notifications', notificationsAPI);
 const rule = new schedule.RecurrenceRule();
 rule.second = 3;
 const job = schedule.scheduleJob("0 0 2 * * *", function(){
-  utils.calculateTeacherCourseNum()
+  helper.calculateTeacherCourseNum()
 });
 
-// utils.calculateTeacherCourseNum()
+helper.calculateTeacherCourseNum()
 
 /* MongoDB connection 
  * @author: znz

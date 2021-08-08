@@ -8,14 +8,12 @@
 */
 
 var mongoose = require('mongoose');
-var Tuition = require('./tuition');
-var Paycheck = require('./paycheck');
 var Teacher = require('./teacher');
 var Course = require('./course');
 var Student = require('./student');
 var TeacherRate = require('./teacher_rate');
 var LevelSalary = require('./level_salary');
-const utils = require('../utils');
+var utils = require('../utils');
 
 var reportSchema = new mongoose.Schema({
   teacher_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'},

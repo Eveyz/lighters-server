@@ -20,7 +20,7 @@
     "cookie-parser": "^1.4.3",
     "cross-env": "^5.2.0",
     "dotenv": "^8.2.0",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "jake": "^10.6.1",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",

@@ -2,9 +2,6 @@ require('dotenv').config();
 
 const fs = require('fs');
 const https = require('https');
-const privateKey = fs.readFileSync(`${process.env.SSL_LOCATION}/${process.env.SSL_KEY}`, 'utf8');
-const certificate = fs.readFileSync(`${process.env.SSL_LOCATION}/${process.env.SSL_PEM}`, 'utf8');
-const credentials = {key: privateKey, cert: certificate};
 
 const express = require("express");
 const mongoose = require('mongoose');
@@ -106,6 +103,10 @@ if (process.env.NODE_ENV === "production") {
   server.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '/build/index.html'));
   });
+
+  const privateKey = fs.readFileSync(`${process.env.SSL_LOCATION}/${process.env.SSL_KEY}`, 'utf8');
+  const certificate = fs.readFileSync(`${process.env.SSL_LOCATION}/${process.env.SSL_PEM}`, 'utf8');
+  const credentials = {key: privateKey, cert: certificate};
 
   https.createServer(credentials, server).listen(PORT, () => {
     console.log("Production server is on")

@@ -111,16 +111,20 @@ router.get('/:_id', (req, res) => {
 });
 
 /* Create Report */
-router.post('/', upload, authenticate, (req, res) => {
+router.post('/', upload, authenticate, async (req, res) => {
   let _report = JSON.parse(req.body.report);
 
   const _teacher_id = mongoose.Types.ObjectId(_report.teacher_id);
   const _course_id = mongoose.Types.ObjectId(_report.course_id);
   const _student_id = mongoose.Types.ObjectId(_report.student_id);
+
   _report.teacher_id = _teacher_id;
   _report.course_id = _course_id;
   _report.student_id = _student_id;
   _report.audios = [];
+  
+  const course = await Course.findOne({_id: _course_id})
+  _report.course_rate = course.course_rate
 
   if(req.files) {
     req.files.forEach(file => {

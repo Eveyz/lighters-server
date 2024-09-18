@@ -2,7 +2,7 @@ const env = process.env;
 
 if (process.env.NODE_ENV !== "test") {
   var mongoose = require('mongoose');
-  var url = 'mongodb://localhost:27017/lighters';
+  var url = process.env.MONGODB_URI;
   var options = { useNewUrlParser: true, useCreateIndex: true };
   var db = mongoose.connect(url, options).then(
     () => {

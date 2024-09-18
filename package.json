@@ -7,6 +7,7 @@
     "dev": "nodemon --exec babel-node server.js --ignore public/",
     "test": "cross-env NODE_ENV=test mocha --recursive --timeout 10000000 --exit",
     "init": "node ./tasks/devInit.js",
+    "render": "npm run start",
     "prod": "cross-env NODE_ENV=production nodemon --exec babel-node server.js --ignore public/"
   },
   "author": "",

@@ -116,7 +116,22 @@ if (process.env.NODE_ENV === "production") {
     // Prevent dirty exit on code-fault crashes:
     process.on('uncaughtException', gracefulShutdown);
   });
+} else if (process.env.NODE_ENV === "render") {
+  server.use(logger('combined'));
+  server.use(express.static(path.join(__dirname, '/build')));
 
+  server.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/build/index.html'));
+  });
+
+  https.createServer(credentials, server).listen(PORT, () => {
+    console.log("Production server is on")
+    // Handle kill commands
+    process.on('SIGTERM', gracefulShutdown);
+
+    // Prevent dirty exit on code-fault crashes:
+    process.on('uncaughtException', gracefulShutdown);
+  });
 } else {
   server.listen(PORT, () => {
     console.info('Express listenning on port ', PORT);
